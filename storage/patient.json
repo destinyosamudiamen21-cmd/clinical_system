@@ -1,0 +1,43 @@
+[
+    {
+        "patient_id": "102",
+        "full_Name": "John wick",
+        "age": 28,
+        "gender": "Male",
+        "phone_Number": "099200223",
+        "address": "No 1, jsjhdbuhs",
+        "diagnosis": "Cancer"
+    },
+    {
+        "patient_id": "201",
+        "full_name": "Fred Holland",
+        "age": 21,
+        "gender": "Male",
+        "phone_number": "0200200120",
+        "address": "No 1, sweet road",
+        "diagnosis": "Cancer"
+    },
+    {
+        "patient_id": "101",
+        "full_name": "Steve Jones",
+        "age": 21,
+        "gender": "Male",
+        "phone_number": "0912212121",
+        "address": "No 1, fed street",
+        "diagnosis": "Sickle cell"
+    },
+    {
+        "patient_id": "301",
+        "full_name": "Harly Kelvin",
+        "age": 34,
+        "gender": "Male",
+        "phone_Number": "09222222",
+        "address": "No 1, gggggg",
+        "diagnosis": "Malaria",
+        "nationality": "Nigerian",
+        "tribe": "Benin",
+        "occupation": "Student",
+        "marital_status": "Single",
+        "next_of_kin": "Sister"
+    }
+]
