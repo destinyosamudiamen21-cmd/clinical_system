@@ -46,9 +46,6 @@ class PatientManager:
 
         return {"status": "successful"}
 
-        
-       
-
 
     def remove_patient(self, patient_id):
 

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Patient</title>
+    <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
+    rel="stylesheet" 
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" 
+    crossorigin="anonymous">
+  </head>
+  <body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header">
+                <h1>Register Patient</h1>
+                 <!-- <script 
+                 src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+
+                 </script> -->
+            </div>
+
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Patient ID</label>
+                    <input 
+                    type="text"
+                    id="patient_id"
+                    class="form-control"
+                    placeholder="Enter Patient ID">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input 
+                    type="text"
+                    id="full_name"
+                    class="form-control"
+                    placeholder="Enter Full Name">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Age</label>
+                    <input 
+                    type="text"
+                    id="age"
+                    class="form-control"
+                    placeholder="Enter Age">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Gender</label>
+                    <input 
+                    type="text"
+                    id="gender"
+                    class="form-control"
+                    placeholder="Enter Gender">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input 
+                    type="text"
+                    id="phone_Number"
+                    class="form-control"
+                    placeholder="Enter Phone Number">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Diagnosis</label>
+                    <input 
+                    type="text"
+                    id="diagnosis"
+                    class="form-control"
+                    placeholder="Enter Patient Diagnosis">
+
+                <div class="mb-3">
+                    <label class="form-label">Nationality</label>
+                    <input 
+                    type="text"
+                    id="nationality"
+                    class="form-control"
+                    placeholder="Enter Nationality">
+
+                <div class="mb-3">
+                    <label class="form-label">Occupation</label>
+                    <input 
+                    type="text"
+                    id="occupation"
+                    class="form-control"
+                    placeholder="Enter Occupation">
+                </div>
+                <button 
+                onclick="registerPatient()" 
+                class="btn btn-primary">
+                    Save Patient
+                </button>
+            </div>
+
+        </div>
+        
+    </div>
+    
+
+    <script>
+      async function registerPatient() {
+        const patient = {
+          patient_id: (document.getElementById("patient_id").value = ""),
+          full_name: (document.getElementById("full_name").value = ""),
+          age: parseInt((document.getElementById("age").value = "")),
+          gender: (document.getElementById("gender").value = ""),
+          address: (document.getElementById("address").value = ""),
+          phone_Number: (document.getElementById("phone_number").value = ""),
+          diagnosis: (document.getElementById("diagnosis").value = ""),
+          nationality: (document.getElementById("nationality").value = ""),
+          tribe: (document.getElementById("tribe").value = ""),
+          occupation: (document.getElementById("tribe").value = ""),
+          marital_status: (document.getElementById("marital_status").value =
+            ""),
+          next_of_kin: (document.getElementById("next_of_kin").value = ""),
+        };
+
+        const response = await fetch("http://127.0.0.1:8000/patient", {
+          method: "POST",
+
+          headers: {
+            "content-Type": "application/json",
+          },
+          body: JSON.stringify(patient),
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        alert("Patient saved");
+      }
+    </script>
+  </body>
+</html>

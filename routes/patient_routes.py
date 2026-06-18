@@ -21,7 +21,7 @@ class PatientSchema(BaseModel):
     next_of_kin: str
 
 
-@patient_router.get("/{patient_id}")
+@patient_router.get("/{patient_id}", status_code=201)
 def get_patient(patient_id: str):
 
     patient = manager.search_patient(patient_id)

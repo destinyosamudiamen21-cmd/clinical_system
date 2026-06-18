@@ -16,7 +16,7 @@ class AppointmentScheme(BaseModel):
 
 
 
-@appointment_router.get("/{appointment_id}")
+@appointment_router.get("/{appointment_id}", status_code=201)
 def get_appointments(appointment_id: str):
     appointment = manager.search_appointment(appointment_id)
     return appointment
