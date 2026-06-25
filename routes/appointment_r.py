@@ -1,43 +1,30 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
+from models.appointment import Appointment
+from sqlmodel import Session
 from services.appoint_manager import AppointmentManager
-from pydantic import BaseModel
+from storage.database import get_session
 
 appointment_router = APIRouter()
 
 manager = AppointmentManager()
 
-class AppointmentScheme(BaseModel):
-   appointment_id: str
-   patient_id: str
-   appointment_data: str
-   doctor_name: str
-   reason: str
-   status: str
-
-
-
-@appointment_router.get("/{appointment_id}", status_code=201)
-def get_appointments(appointment_id: str):
-    appointment = manager.search_appointment(appointment_id)
-    return appointment
+@appointment_router.get("/{id}")
+def get_appointments(appointment_id: int, session: Session = Depends(get_session)):
+    return manager.search_appointment(appointment_id, session)
 
 @appointment_router.get("/")
-def list_of_appointments():
-    appointment = manager.list_appoinment()
-    return appointment
+def list_of_appointments(session: Session= Depends(get_session)):
+    return manager.list_appoinment(session)
 
 @appointment_router.post("/")
-def create_appointment(appointment: AppointmentScheme):
-    appointment = manager.create_appointment(appointment.model_dump())
-    return appointment
+def create_appointment(appointment:Appointment, session: Session=Depends(get_session)):
+    return manager.create_appointment(appointment, session)
     
-@appointment_router.put("/{appointment_id}")
-def update_appointment(appointment_id: str, appointment: AppointmentScheme):
-    appointment = manager.update_appointment(appointment_id, appointment.model_dump())
-    return appointment
+@appointment_router.put("/{id}")
+def update_appointment(appointment_id:int, appointment: Appointment, session: Session = Depends(get_session)):
+    return(appointment,appointment_id, session)
     
-@appointment_router.delete("/{appointment_id}")
-def delete_appointment(appointment_id: str):
-    appointment = manager.delete_appointment(appointment_id)
-    return appointment
+@appointment_router.delete("/{id}")
+def delete_appointment(appointment_id: int, session: Session = Depends(get_session)):
+    return(appointment_id, session)
     

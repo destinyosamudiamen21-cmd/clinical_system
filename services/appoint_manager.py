@@ -1,90 +1,46 @@
 from models.appointment import Appointment
-import json
+from sqlmodel import Session, select
 
 
 class AppointmentManager:
     
-    def create_appointment(self, appointment_data: dict):
+    def create_appointment(self, appointment_data: Appointment, session: Session ):
+        session.add(appointment_data)
+        session.commit()
+        session.refresh(appointment_data)
+        return appointment_data
 
-        try:
-            with open("storage/appoint.json", "r") as file:
-                appointments = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            appointments = []
-
-        appointments.append(appointment_data)
-
-        for appointment in appointments:
-            if appointment["appointment_id"] == appointment_data["appointment_id"]:
-                return {"error" : 
-                        "Appointment Id already exist"}
-            
-        with open("storage/appoint.json", "w") as file:
-            json.dump(appointments, file, indent=4)
-
-        return {"status" : "successful"}
-
-
-    def search_appointment(self, appointment_id: str):
-        try:
-            with open("storage/appoint.json", "r") as file:
-                appointments = json.load(file)
-        except FileNotFoundError:
-            {"error" : "Patient appointment file not found"}
-
-        for appointment in appointments:
-            if appointment["appointment_id"] == appointment_id:
-
-                return appointment
+    def search_appointment(self, appointment_id: int, session:Session ):
+        # getting patient appointment
+        p_appointment = session.get(Appointment, appointment_id)
+        if not p_appointment:
+            return None
+        else:
+            return p_appointment
         
+    def update_appointment(self, appointment_id: int, updated_appointment_data: dict, session: Session):
+        p_appointment = session.get(Appointment, appointment_id)
+        if not p_appointment:
+            return None
+        else:
+            for key, value in updated_appointment_data.items():
+                setattr(Appointment, key, value)
+            session.add(p_appointment)
+            session.commit()
+            session.refresh()
+            return p_appointment
 
-    def update_appointment(self, appointment_id: str, appointment_data: dict):
-        try:
-            with open("storage/appoint.json", "r") as file:
-                appointments = json.load(file)
-        except FileNotFoundError:
-            {"error" : "No Patient appointment found"}
-
-        for appointment in appointments:
-            if appointment["appointment_id"] == appointment_id:
-                appointment.update(appointment_data)
-
-        with open("storage/appoint.json", "w") as file:
-            json.dump(appointments, file, indent=4)
-
-        return {"status" : "successful"}
-
-    def delete_appointment(self, appointment_id: str):
-
-        try:
+    def delete_appointment(self, appointment_id: str, session: Session):
+        p_appointment = session.get(Appointment, appointment_id)
+        if not p_appointment:
+            return None
+        else:
+            session.delete(p_appointment)
+            session.commit()
+            return {"status": "sucessfull"}
     
-            with open("storage/appoint.json", "r") as file:
-                appointments = json.load(file)
-
-        except FileNotFoundError:
-            {"error" : "Patient appointment not found"}
-    
-
-        remaining_appointment = [
-            appointment
-            for appointment in appointments
-            if appointment["appointment_id"] != appointment_id
-        ]
-
-        with open("storage/appoint.json", "w") as file:
-            json.dump(remaining_appointment, file, indent=4)
-
-        return {"status" : "successful"}
-
-    def list_appoinment(self):
-        try:
-            with open("storage/appoint.json", "r") as file:
-                appointments = json.load(file)
-        except FileNotFoundError:
-            {"error" : "Patient list not found"}
-
-        for appointment in appointments:
-
-            return appointments
+    def list_appoinment(self, session: Session):
+        return session.exec(select(Appointment)).all()
+        
             
         

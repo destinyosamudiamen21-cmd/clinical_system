@@ -1,55 +1,29 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
+from models.patient import Patient
+from storage.database import get_session
 from services.patient_manager import PatientManager
-from pydantic import BaseModel
 
 patient_router = APIRouter()
 
 manager = PatientManager()
 
-class PatientSchema(BaseModel):
-    patient_id: str
-    full_name: str
-    age: int
-    gender: str
-    phone_Number: str
-    address: str
-    diagnosis: str
-    nationality: str
-    tribe: str
-    occupation: str
-    marital_status: str
-    next_of_kin: str
-
-
-@patient_router.get("/{patient_id}", status_code=201)
-def get_patient(patient_id: str):
-
-    patient = manager.search_patient(patient_id)
-
-    return patient
+@patient_router.get("/{id}")
+def get_patient(patient_id:int, session:Session=Depends(get_session)):     
+    return manager.search_patient( patient_id, session)
 
 @patient_router.get("/")
-def patient_list(limit: int = 10):
-
-    patient = manager.patient_list()
-
-    return patient
+def patient_list(session: Session=Depends(get_session)):
+    return manager.patient_list(session)
 
 @patient_router.post("/")
-def create_patient(patient:PatientSchema):
-    patient = manager.add_patient(patient.model_dump())
-    return patient
-
+def create_patient(patient:Patient, session: Session=Depends(get_session)):
+    return manager.add_patient(patient, session)
 
 @patient_router.put("/{patient_id}")
-def update_patient(patient_id: str, patient: PatientSchema):
-    patient = manager.update_patient(patient_id, patient.model_dump())
-
-    return patient
+def update_patient(patient_id: int, patient: Patient, session: Session=Depends(get_session)):
+    return manager.update_patient(patient, patient_id, session)
 
 @patient_router.delete("/{patient_id}")
-def delete_patient(patient_id: str):
-
-    patient = manager.remove_patient(patient_id)
-
-    return patient
+def delete_patient(patient_id:int, session: Session=Depends(get_session)):
+    return manager.remove_patient(patient_id, session)
