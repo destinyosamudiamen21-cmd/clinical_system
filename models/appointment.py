@@ -1,10 +1,13 @@
-from dataclasses import dataclass
-# from datetime import datetime
+from sqlmodel import SQLModel, Field
+from typing import Optional
+from datetime import datetime
 
-@dataclass
-class Appointment:
 
-    appointment_id: str
+
+
+class Appointment(SQLModel, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
 
     patient_id: str
 
@@ -15,3 +18,5 @@ class Appointment:
     reason: str
 
     status: str
+
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
