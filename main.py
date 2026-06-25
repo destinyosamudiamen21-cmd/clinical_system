@@ -1,31 +1,26 @@
 from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-
-
+from contextlib import asynccontextmanager
+from storage.database import create_db_and_tables,engine
 from routes.appointment_r import appointment_router
 from routes.patient_routes import patient_router
 
 
-app = FastAPI()
+
+
+@asynccontextmanager
+async def lifespan(app):
+    create_db_and_tables()
+    yield
+    engine.dispose()
+
+app = FastAPI(lifespan=lifespan)
 
 
 
-app.add_middleware(
-    
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+@app.get("/", include_in_schema=False)
+def home(request: Request):
+    return {"clinic:" "Restore medical Center"}
 
-)
-
-template = Jinja2Templates(directory="templates")
-
-@app.get("/")
-def home():
-    return{"message": "Clincal system"}
 
 app.include_router(
     patient_router,

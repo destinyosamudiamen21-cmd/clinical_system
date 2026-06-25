@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restore Medical Center</title>
+  </head>
+  <body>
+    <h1>Clinical System dashboard</h1>
+    <hr />
+    {% for patient in patients %}
+    <div>
+      <h2>{{ patient.full_name}}</h2>
+      <p><strong>Patient ID:</strong>{{ patient.patient_id }}</p>
+      <p><strong>Age:</strong>{{patient.age}}</p>
+      <p><strong>Diagnosis</strong>{{ patient.diagnosis }}</p>
+    </div>
+    <hr />
+    {% endfor %}
+  </body>
+</html>
