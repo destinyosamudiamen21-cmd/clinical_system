@@ -20,6 +20,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def home(request: Request):
     with open("templates/home.html", "r") as file:
         return HTMLResponse(content=file.read())
+    
+@app.get("/patients", include_in_schema=False)
+def patient():
+    with open("templates/patients.html", "r") as file:
+        return HTMLResponse(content=file.read())
 
 app.include_router(
     patient_router,

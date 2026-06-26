@@ -15,6 +15,7 @@ async function loadDashboardstats() {
   const todayAppointments = appointments.filter(
     a.appointment_date.startsWith(today)
   );
-  document.getElementById("todays-appointment").textAppointment.length;
+  document.getElementById("todays-appointments").textContent =
+    todayAppointments.length;
 }
 loadDashboardstats();
