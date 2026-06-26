@@ -4,18 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Restore Medical Center</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
-    <h1>Clinical System dashboard</h1>
-    <hr />
-    {% for patient in patients %}
-    <div>
-      <h2>{{ patient.full_name}}</h2>
-      <p><strong>Patient ID:</strong>{{ patient.patient_id }}</p>
-      <p><strong>Age:</strong>{{patient.age}}</p>
-      <p><strong>Diagnosis</strong>{{ patient.diagnosis }}</p>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark bg-primary px-4">
+      <span class="navbar-brand fw-bold">Restore Medical Center</span>
+    </nav>
+
+    <!-- Main CONTENT -->
+    <div class="container mt-4">
+        <!-- STAT CARDS -->
+         <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                    <h6 class="card-substitle text-muted">Total Patients</h6>
+                    <h2 class="card-title fw-bold" id="total-patients">--</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-substitle text-muted">Today's Appointments</h6>
+                            <h2 class="card-title fw-bold" id="todays-appointments">--</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-substitle text-muted">Total Appointments</h6>
+                            <h2 class="card-title fw-bold" id="total-appointments">--</h2>
+                        </div>
+                    </div>
+                </div>
+    
+    <!-- QUICK ACTIONS -->
+    <div class="mt-4">
+      <h5 class="mb-3">Quick Actions</h5>
+      <a href="/patients" class="btn btn-primary me-2">Register Patient</a>
+      <a href="/appointments" class="btn btn-success">Book Appointments</a>
     </div>
-    <hr />
-    {% endfor %}
+    <!-- bootstraps JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="/static/dashboard.js"></script>
   </body>
 </html>
