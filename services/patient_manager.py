@@ -36,7 +36,7 @@ class PatientManager:
         if not patient:
             return None
         else:
-            session.delete(patient)
+            patient.is_active = False
             session.commit()
 
             return {"status": "Patient deleted successfully"}
@@ -50,7 +50,7 @@ class PatientManager:
                 
     def patient_list(self, session: Session):
         return session.exec(
-            select(Patient) ).all()
+            select(Patient).where(Patient.is_active == True) ).all()
 
 
        

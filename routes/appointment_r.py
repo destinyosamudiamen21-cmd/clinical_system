@@ -24,11 +24,11 @@ def list_of_appointments(session: Session= Depends(get_session)):
 def create_appointment(appointment:AppointmentCreate, session: Session=Depends(get_session)):
     return manager.create_appointment(appointment, session)
     
-@appointment_router.put("/{id}")
+@appointment_router.put("/{appointment_id}")
 def update_appointment(appointment_id:int, appointment: AppointmentCreate, session: Session = Depends(get_session)):
     return manager.update_appointment(appointment_id,appointment.model_dump() ,session)
 
-@appointment_router.delete("/{id}")
+@appointment_router.delete("/{appointment_id}")
 def delete_appointment(appointment_id: int, session: Session = Depends(get_session)):
     return manager.delete_appointment(appointment_id, session)
     

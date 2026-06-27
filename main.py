@@ -13,7 +13,7 @@ async def lifespan(app):
     yield
     engine.dispose()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, redirect_slashes=False)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", include_in_schema=False)
@@ -24,6 +24,11 @@ def home(request: Request):
 @app.get("/patients", include_in_schema=False)
 def patient():
     with open("templates/patients.html", "r") as file:
+        return HTMLResponse(content=file.read())
+    
+@app.get("/appointments", include_in_schema=False)
+def appointments():
+    with open("templates/appointments.html", "r") as file:
         return HTMLResponse(content=file.read())
 
 app.include_router(

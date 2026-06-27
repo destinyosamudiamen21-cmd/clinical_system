@@ -29,4 +29,5 @@ class Patient(PatientBase, table=True):
           primary_key=True
           )
     created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    is_active: bool =  Field(default=True)
 
