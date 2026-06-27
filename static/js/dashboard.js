@@ -12,7 +12,7 @@ async function loadDashboardstats() {
 
   // Fetch today's appointments
   const today = new Date().toISOString().split("T")[0];
-  const todayAppointments = appointments.filter(
+  const todayAppointments = appointments.filter((a) =>
     a.appointment_date.startsWith(today)
   );
   document.getElementById("todays-appointments").textContent =

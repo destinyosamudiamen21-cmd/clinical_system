@@ -12,7 +12,7 @@ manager = PatientManager()
 def search_by_name(name: str, session: Session = Depends(get_session)):
     return manager.search_by_name(name, session)
 
-@patient_router.get("/{id}")
+@patient_router.get("/{patient_id}")
 def get_patient(patient_id:int, session:Session=Depends(get_session)):     
     return manager.search_patient( patient_id, session)
 
