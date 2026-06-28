@@ -66,7 +66,7 @@ async function deletePatient(id) {
   const confirm = window.confirm("Delete this patient?");
   if (!confirm) return;
 
-  await fetch(`/patient/${id}/`, {
+  await fetch(`/patient/${id}`, {
     method: "DELETE",
   });
   loadPatients();
