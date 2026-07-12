@@ -42,13 +42,7 @@ class AppointmentManager:
             session.delete(p_appointment)
             session.commit()
             return {"status": "sucessfull"}
-        
-    def search_by_name(self, appointment_id: int, session: Session):
-        p_appointment = session.get(Appointment, appointment_id)
-        if not p_appointment:
-            return None
-        else:
-            return p_appointment
+    
     
     def list_appoinment(self, session: Session):
         return session.exec(select(Appointment)).all()

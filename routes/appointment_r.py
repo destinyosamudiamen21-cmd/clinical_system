@@ -8,10 +8,6 @@ appointment_router = APIRouter()
 
 manager = AppointmentManager()
 
-@appointment_router.get("/search")
-def search_by_name(name: str, session: Session = Depends(get_session)):
-    return manager.search_by_name(name, session)
-
 @appointment_router.get("/{appointment_id}")
 def get_appointments(appointment_id: int, session: Session = Depends(get_session)):
     return manager.search_appointment(appointment_id, session)
