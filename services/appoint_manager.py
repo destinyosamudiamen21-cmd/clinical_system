@@ -1,10 +1,14 @@
 from models.appointment import Appointment,AppointmentCreate
 from sqlmodel import Session, select
+from models.patient import Patient
 
 
 class AppointmentManager:
     
     def create_appointment(self, appointment_data: AppointmentCreate, session: Session ):
+        patient = session.get(Patient, appointment_data.patient_id)
+        if not patient:
+            return None
         appointment = Appointment.model_validate(appointment_data)
         session.add(appointment)
         session.commit()
