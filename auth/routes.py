@@ -3,14 +3,14 @@ from sqlmodel import Session
 from fastapi.exceptions import HTTPException
 from storage.database import get_session
 from auth.services import UserManager
-from auth.model import UserCreate
+from auth.model import UserCreate,UserRead
 
 
 auth_router = APIRouter()
 
 manager = UserManager()
 
-@auth_router.post("/signup")
+@auth_router.post("/signup", response_model=UserRead)
 def create_user_account(user_data: UserCreate, session:Session = Depends(get_session)):
     existing_user = manager.get_user_by_email(user_data.email, session)
     if existing_user:

@@ -13,6 +13,10 @@ class UserCreate(UserBase):
     """What the fastapi recieves"""
     password: str
 
+class UserRead(UserBase):
+    uid: uuid.UUID
+    created_at: Optional[datetime]
+
 class User(UserBase, table=True):
     """what goes to postresql"""
     uid : uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
