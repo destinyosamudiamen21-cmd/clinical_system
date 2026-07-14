@@ -12,7 +12,6 @@ class UserBase(SQLModel):
 class UserCreate(UserBase):
     """What the fastapi recieves"""
     password: str
-    pass
 
 class User(UserBase, table=True):
     """what goes to postresql"""
