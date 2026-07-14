@@ -6,6 +6,7 @@ from auth.services import UserManager
 from auth.model import UserCreate,UserRead
 from auth.model import Userlogin
 from auth.security import verify_password_hash, create_access_token
+from auth.dependencies import get_current_user
 
 
 auth_router = APIRouter()
@@ -40,3 +41,6 @@ def login_user(login_data: Userlogin, session:Session = Depends(get_session)):
     })
     return {"access_token": token, "token_type": "bearer"}
     
+@auth_router.get("/me")
+def get_me(current_user: dict = Depends(get_current_user)):
+    return{"message": "You are authenticated", "user": current_user}
