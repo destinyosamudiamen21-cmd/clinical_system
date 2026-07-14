@@ -17,6 +17,10 @@ class UserRead(UserBase):
     uid: uuid.UUID
     created_at: Optional[datetime]
 
+class Userlogin(SQLModel):
+    email: str
+    password: str
+
 class User(UserBase, table=True):
     """what goes to postresql"""
     uid : uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
