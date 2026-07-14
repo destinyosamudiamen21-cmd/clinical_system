@@ -1,6 +1,7 @@
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException
 from auth.security import decode_access_token
+from typing import List
 
 bearer_scheme = HTTPBearer()
 
@@ -13,3 +14,16 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     #return the user info from the payload
     return token_data["user"]
+
+class RoleChecker:
+    def __init__(self, allowed_roles: List[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user: dict = Depends(get_current_user)):
+        if current_user["role"] not in self.allowed_roles:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to perform this action"
+            )
+        return current_user
+        
