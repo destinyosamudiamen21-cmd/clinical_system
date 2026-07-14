@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from storage.database import create_db_and_tables,engine
 from routes.appointment_r import appointment_router
 from routes.patient_routes import patient_router
+from auth.routes import auth_router
 
 
 @asynccontextmanager
@@ -43,5 +44,10 @@ app.include_router(
     tags= ["Appointment"]
 )
 
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["auth"]
+)
 
 
