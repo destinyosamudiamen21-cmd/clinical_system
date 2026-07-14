@@ -1,8 +1,6 @@
 from models.patient import Patient, PatientCreate
 from sqlmodel import Session, select
 
-
-
 class PatientManager:
 
     def search_by_name(self, name: str, session:Session):
