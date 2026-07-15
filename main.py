@@ -7,7 +7,7 @@ from routes.appointment_r import appointment_router
 from routes.patient_routes import patient_router
 from auth.routes import auth_router
 from routes.consultation_f_routes import consult_routes
-
+from routes.pin_routes import payment_router
 
 @asynccontextmanager
 async def lifespan(app):
@@ -55,5 +55,11 @@ app.include_router(
     consult_routes,
     prefix="/consultation_fee",
     tags=["Consultation fee"]
+)
+
+app.include_router(
+    payment_router,
+    prefix="/payment",
+    tags=["payment"]
 )
 
