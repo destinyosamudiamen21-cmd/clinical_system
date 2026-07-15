@@ -19,7 +19,7 @@ class AppointmentManager:
         )
 
         if not payment:
-            raise HTTPException(status_code=404, detail="invalid or used pin")
+            raise HTTPException(status_code=403, detail="invalid or used pin")
         appointment = Appointment.model_validate(appointment_data)
         session.add(appointment)
 
