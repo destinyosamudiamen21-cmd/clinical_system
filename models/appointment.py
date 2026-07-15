@@ -13,7 +13,7 @@ class AppointmentBase(SQLModel):
 
 class AppointmentCreate(AppointmentBase):
     """What Api receives"""
-    pass
+    pin: str
 
 class Appointment(AppointmentBase, table=True):
     """What gets saved to PostgreSQL"""

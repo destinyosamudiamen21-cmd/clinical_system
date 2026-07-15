@@ -1,16 +1,32 @@
 from models.appointment import Appointment,AppointmentCreate
 from sqlmodel import Session, select
 from models.patient import Patient
-
+from services.pin_generator import PaymentManager
+from fastapi.exceptions import HTTPException
+payment_manager = PaymentManager()
 
 class AppointmentManager:
     
     def create_appointment(self, appointment_data: AppointmentCreate, session: Session ):
         patient = session.get(Patient, appointment_data.patient_id)
         if not patient:
-            return None
+            raise HTTPException(status_code=404, detail="Patient not found")
+        #a valid and unused pin must exit for this patient
+        payment = payment_manager.get_valid_pin(
+            appointment_data.pin,
+            appointment_data.patient_id,
+            session
+        )
+
+        if not payment:
+            raise HTTPException(status_code=404, detail="invalid or used pin")
         appointment = Appointment.model_validate(appointment_data)
         session.add(appointment)
+
+        #mark new pin as used and prevent reuse
+        payment.is_used = True
+        session.add(payment)
+
         session.commit()
         session.refresh(appointment)
         return appointment 
