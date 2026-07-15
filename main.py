@@ -6,6 +6,7 @@ from storage.database import create_db_and_tables,engine
 from routes.appointment_r import appointment_router
 from routes.patient_routes import patient_router
 from auth.routes import auth_router
+from routes.consultation_f_routes import consult_routes
 
 
 @asynccontextmanager
@@ -50,4 +51,9 @@ app.include_router(
     tags=["auth"]
 )
 
+app.include_router(
+    consult_routes,
+    prefix="/consultation_fee",
+    tags=["Consultation fee"]
+)
 
