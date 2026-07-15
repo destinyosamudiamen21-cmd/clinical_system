@@ -49,6 +49,13 @@ class PatientManager:
     def patient_list(self, session: Session):
         return session.exec(
             select(Patient).where(Patient.is_active == True) ).all()
+    
+    def find_duplicate(self, full_name:str, phone_number:str, session: Session):
+        statement = select(Patient).where(
+            Patient.full_name == full_name,
+            Patient.phone_number == phone_number
+        )
+        return session.exec(statement).first()
 
 
        

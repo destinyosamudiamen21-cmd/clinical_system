@@ -4,6 +4,7 @@ from models.patient import PatientCreate
 from storage.database import get_session
 from services.patient_manager import PatientManager
 from auth.dependencies import RoleChecker, get_current_user
+from fastapi.exceptions import HTTPException
 
 patient_router = APIRouter()
 
@@ -38,6 +39,9 @@ def create_patient(
     session: Session=Depends(get_session),
     current_user = Depends(get_current_user)
     ):
+    existing = manager.find_duplicate(patient.full_name, patient.phone_number, session)
+    if existing:
+        raise HTTPException(status_code=409, detail="A patient named {existing.full_name} with this phone number already exists")
     return manager.add_patient(patient, session)
 
 @patient_router.put("/{patient_id}")
