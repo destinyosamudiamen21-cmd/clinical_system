@@ -11,6 +11,7 @@ from routes.pin_routes import payment_router
 
 
 
+
 @asynccontextmanager
 async def lifespan(app):
     create_db_and_tables()
