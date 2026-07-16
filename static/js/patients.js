@@ -4,45 +4,54 @@ const searchInput = document.getElementById("searchInput");
 // Render patients into table
 function renderPatients(patients) {
   tableBody.innerHTML = "";
+  const role = getCurrentRole(); // read logged-in role from token
+  const isAdmin = role === "admin";
 
   if (patients.length === 0) {
     tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center text-muted">
-                    No patients found
-                </td>
-            </tr>`;
+      <tr>
+        <td colspan="6" class="text-center text-muted">No patients found</td>
+      </tr>`;
     return;
   }
 
   patients.forEach((patient) => {
+    // Admin-only action buttons; others see "View only"
+    const actions = isAdmin
+      ? `
+          <button class="btn btn-sm btn-success"
+              onclick="confirmPayment(${patient.id}, '${patient.full_name}')">
+            Confirm Payment
+          </button>
+          <button class="btn btn-sm btn-danger"
+              onclick="deletePatient(${patient.id})">
+            Delete
+          </button>
+        `
+      : `<span class="text-muted small">View only</span>`;
+
     const row = `
-            <tr>
-                <td>${patient.id}</td>
-                <td>
-                  <span
-                    style="cursor:pointer; color:#0d6efd; text-decoration:underline"
-                    onclick="openViewModal(${patient.id})">
-                      ${patient.full_name}
-                  </span>
-                </td>
-                <td>${patient.age}</td>
-                <td>${patient.gender}</td>
-                <td>${patient.phone_number}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" 
-                        onclick="deletePatient(${patient.id})">
-                        Delete
-                    </button>
-                </td>
-            </tr>`;
+      <tr>
+        <td>${patient.id}</td>
+        <td>
+          <span style="cursor:pointer; color:#0d6efd; text-decoration:underline"
+                onclick="openViewModal(${patient.id})">
+            ${patient.full_name}
+          </span>
+        </td>
+        <td>${patient.age}</td>
+        <td>${patient.gender}</td>
+        <td>${patient.phone_number}</td>
+        <td>${actions}</td>
+      </tr>`;
     tableBody.innerHTML += row;
   });
 }
 
 // Load all patients on page open
 async function loadPatients() {
-  const response = await fetch("/patient/");
+  const response = await authFetch("/patient/");
+  if (!response) return;
   const patients = await response.json();
   renderPatients(patients);
 }
@@ -50,31 +59,62 @@ async function loadPatients() {
 // Search as you type
 searchInput.addEventListener("input", async function () {
   const name = this.value.trim();
-
   if (name === "") {
     loadPatients();
     return;
   }
-
-  const response = await fetch(`/patient/name?name=${name}`);
+  const response = await authFetch(`/patient/name?name=${name}`);
+  if (!response) return;
   const patients = await response.json();
   renderPatients(patients);
 });
 
 // Delete patient
 async function deletePatient(id) {
-  const confirm = window.confirm("Delete this patient?");
-  if (!confirm) return;
-
-  await fetch(`/patient/${id}`, {
-    method: "DELETE",
-  });
+  if (!window.confirm("Delete this patient?")) return;
+  const response = await authFetch(`/patient/${id}`, { method: "DELETE" });
+  if (!response) return;
   loadPatients();
+}
+
+// Confirm payment -> generate PIN
+async function confirmPayment(patientId, patientName) {
+  if (
+    !confirm(
+      `Confirm payment for ${patientName}? This generates a booking PIN.`
+    )
+  )
+    return;
+
+  const response = await authFetch("/payment/confirm", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ patient_id: patientId }),
+  });
+  if (!response) return;
+
+  if (response.status === 403) {
+    alert("Only admins can confirm payments.");
+    return;
+  }
+  if (response.status === 404) {
+    alert("Patient not found.");
+    return;
+  }
+
+  if (response.ok) {
+    const payment = await response.json();
+    alert(
+      `Payment confirmed for ${patientName}.\n\nBooking PIN: ${payment.pin}\n\nGive this PIN to book their appointment.`
+    );
+  } else {
+    alert("Could not confirm payment.");
+  }
 }
 
 loadPatients();
 
-// Open modal when Register Patient button clicked
+// Open Register modal
 document.getElementById("registerBtn").addEventListener("click", function () {
   const modal = new bootstrap.Modal(document.getElementById("registerModal"));
   modal.show();
@@ -98,91 +138,82 @@ document
       diagnosis: document.getElementById("reg_diagnosis").value || null,
     };
 
-    const response = await fetch("/patient/", {
+    const response = await authFetch("/patient/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patient),
     });
+    if (!response) return;
+
+    if (response.status === 409) {
+      alert("A patient with this name and phone number already exists.");
+      return;
+    }
 
     if (response.ok) {
       bootstrap.Modal.getInstance(
         document.getElementById("registerModal")
       ).hide();
       loadPatients();
+    } else {
+      alert("Could not register patient.");
     }
   });
 
 // Open View Patient Modal
 async function openViewModal(patientId) {
-  const response = await fetch(`/patient/${patientId}`);
+  const response = await authFetch(`/patient/${patientId}`);
+  if (!response) return;
   const p = await response.json();
 
   document.getElementById("viewPatientBody").innerHTML = `
     <div class="row g-3">
-      <div class="col-md-6">
-        <small class="text-muted">Full Name</small>
-        <p class="fw-bold">${p.full_name}</p>
-      </div>
-      <div class="col-md-3">
-        <small class="text-muted">Age</small>
-        <p class="fw-bold">${p.age}</p>
-      </div>
-      <div class="col-md-3">
-        <small class="text-muted">Gender</small>
-        <p class="fw-bold">${p.gender}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Phone</small>
-        <p class="fw-bold">${p.phone_number}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Address</small>
-        <p class="fw-bold">${p.address || "—"}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Nationality</small>
-        <p class="fw-bold">${p.nationality || "—"}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Tribe</small>
-        <p class="fw-bold">${p.tribe || "—"}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Occupation</small>
-        <p class="fw-bold">${p.occupation || "—"}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Marital Status</small>
-        <p class="fw-bold">${p.marital_status || "—"}</p>
-      </div>
-      <div class="col-md-6">
-        <small class="text-muted">Next of Kin</small>
-        <p class="fw-bold">${p.next_of_kin || "—"}</p>
-      </div>
-      <div class="col-12">
-        <small class="text-muted">Diagnosis</small>
-        <p class="fw-bold">${p.diagnosis || "—"}</p>
-      </div>
-    </div>
-  `;
+      <div class="col-md-6"><small class="text-muted">Full Name</small><p class="fw-bold">${
+        p.full_name
+      }</p></div>
+      <div class="col-md-3"><small class="text-muted">Age</small><p class="fw-bold">${
+        p.age
+      }</p></div>
+      <div class="col-md-3"><small class="text-muted">Gender</small><p class="fw-bold">${
+        p.gender
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Phone</small><p class="fw-bold">${
+        p.phone_number
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Address</small><p class="fw-bold">${
+        p.address || "—"
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Nationality</small><p class="fw-bold">${
+        p.nationality || "—"
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Tribe</small><p class="fw-bold">${
+        p.tribe || "—"
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Occupation</small><p class="fw-bold">${
+        p.occupation || "—"
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Marital Status</small><p class="fw-bold">${
+        p.marital_status || "—"
+      }</p></div>
+      <div class="col-md-6"><small class="text-muted">Next of Kin</small><p class="fw-bold">${
+        p.next_of_kin || "—"
+      }</p></div>
+      <div class="col-12"><small class="text-muted">Diagnosis</small><p class="fw-bold">${
+        p.diagnosis || "—"
+      }</p></div>
+    </div>`;
 
-  // Store patient on Edit button for next step
   document.getElementById("editFromViewBtn").onclick = () => openEditModal(p);
-
   new bootstrap.Modal(document.getElementById("viewPatientModal")).show();
 }
 
 // Open Edit Patient Modal
 function openEditModal(p) {
-  // Close view modal first
   bootstrap.Modal.getInstance(
     document.getElementById("viewPatientModal")
   ).hide();
 
-  // Store the ID in the hidden input
   document.getElementById("editPatientId").value = p.id;
-
-  // Pre-fill all fields
   document.getElementById("edit_full_name").value = p.full_name;
   document.getElementById("edit_age").value = p.age;
   document.getElementById("edit_gender").value = p.gender;
@@ -195,7 +226,6 @@ function openEditModal(p) {
   document.getElementById("edit_next_of_kin").value = p.next_of_kin || "";
   document.getElementById("edit_diagnosis").value = p.diagnosis || "";
 
-  // Open edit modal
   new bootstrap.Modal(document.getElementById("editPatientModal")).show();
 }
 
@@ -217,11 +247,12 @@ async function savePatientUpdate() {
     diagnosis: document.getElementById("edit_diagnosis").value || null,
   };
 
-  const response = await fetch(`/patient/${patientId}`, {
+  const response = await authFetch(`/patient/${patientId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updatedPatient),
   });
+  if (!response) return;
 
   if (response.ok) {
     bootstrap.Modal.getInstance(

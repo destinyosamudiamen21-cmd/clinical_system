@@ -9,6 +9,8 @@ from auth.routes import auth_router
 from routes.consultation_f_routes import consult_routes
 from routes.pin_routes import payment_router
 
+
+
 @asynccontextmanager
 async def lifespan(app):
     create_db_and_tables()
@@ -17,6 +19,12 @@ async def lifespan(app):
 
 app = FastAPI(lifespan=lifespan, redirect_slashes=False)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/login")
+def login_page(request:Request):
+    with open("templates/login.html") as file:
+        return HTMLResponse(content=file.read())
+
 
 @app.get("/", include_in_schema=False)
 def home(request: Request):

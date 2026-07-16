@@ -1,25 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Clinic — Dashboard</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="data:," />
+
     <style>
+      :root {
+        --brand: #0d6efd;
+        --brand-soft: #eaf1ff;
+        --ink: #1a2b3c;
+        --muted: #7a8a9a;
+        --bg: #f4f6fb;
+        --sidebar: #0b2545;
+      }
+      * {
+        box-sizing: border-box;
+      }
       body {
-        background-color: #f4f6fb;
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        margin: 0;
       }
 
-      .card.shadow-sm {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      /* ---------- SIDEBAR ---------- */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 250px;
+        background: var(--sidebar);
+        color: #cdd9ec;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.25s ease;
+        z-index: 1000;
+      }
+      .sidebar .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 32px;
+        padding: 0 8px;
+      }
+      .sidebar .brand .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--brand);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 18px;
+      }
+      .nav-link-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 10px;
+        color: #cdd9ec;
+        text-decoration: none;
+        font-size: 14.5px;
+        margin-bottom: 4px;
+        transition: background 0.15s, color 0.15s;
+      }
+      .nav-link-item i {
+        font-size: 18px;
+      }
+      .nav-link-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      .nav-link-item.active {
+        background: var(--brand);
+        color: #fff;
+      }
+      .sidebar .spacer {
+        flex: 1;
+      }
+      .logout-link {
+        color: #ff9b9b;
+      }
+      .logout-link:hover {
+        background: rgba(255, 80, 80, 0.15);
+        color: #ff6b6b;
+      }
+
+      /* ---------- MAIN ---------- */
+      .main {
+        margin-left: 250px;
+        padding: 28px 32px;
+        transition: margin 0.25s ease;
+      }
+
+      /* topbar with hamburger (mobile) */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .hamburger {
+        display: none;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      /* welcome banner */
+      .welcome {
+        background: linear-gradient(135deg, #0d6efd, #5b9bff);
+        color: #fff;
+        border-radius: 16px;
+        padding: 26px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .welcome h3 {
+        margin: 4px 0 0;
+        font-weight: 700;
+      }
+      .welcome .sub {
+        opacity: 0.85;
+        font-size: 14px;
+      }
+      .welcome i {
+        font-size: 52px;
+        opacity: 0.85;
+      }
+
+      /* stat cards */
+      .stat-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 16px rgba(13, 38, 76, 0.05);
+        border-left: 4px solid var(--brand);
+        transition: transform 0.15s, box-shadow 0.15s;
+        height: 100%;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(13, 38, 76, 0.09);
+      }
+      .stat-card h6 {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 0 0 6px;
+        font-weight: 500;
+      }
+      .stat-card h2 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 30px;
+      }
+      .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+      }
+
+      /* generic card */
+      .panel {
+        background: #fff;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 16px rgba(13, 38, 76, 0.05);
+        height: 100%;
+      }
+      .panel h6 {
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+
+      .quick-btn {
+        border: none;
         border-radius: 12px;
+        padding: 14px 22px;
+        font-weight: 600;
+        font-size: 15px;
+        color: #fff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.1s, opacity 0.15s;
       }
-      .card.shadow-sm:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08) !important;
+      .quick-btn:hover {
+        opacity: 0.92;
+        transform: translateY(-2px);
+        color: #fff;
       }
+
+      /* quote */
       .quote-banner {
-        margin-top: 24px;
-        padding: 16px;
-        border-radius: 8px;
-        background: #f1f5fb;
-        opacity: 1;
+        margin-top: 4px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 16px rgba(13, 38, 76, 0.05);
         transition: opacity 0.6s ease-in-out;
       }
       .quote-banner.fade-out {
@@ -27,141 +242,160 @@
       }
       .quote-text {
         font-style: italic;
-        font-size: 16px;
+        font-size: 15px;
+        margin: 0;
       }
       .quote-author {
         font-size: 13px;
-        color: #555;
+        color: var(--muted);
+      }
+
+      /* overlay for mobile sidebar */
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: block;
+        }
+        .overlay.show {
+          display: block;
+        }
       }
     </style>
-
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Demo clinic</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-    />
-    <link rel="icon" href="data:," />
   </head>
   <body>
-    <!-- NAVBAR -->
-    <div
-      class="card border-0 shadow-sm mb-4"
-      style="background: linear-gradient(135deg, #0d6efd, #5b9bff)"
-    >
-      <div
-        class="card-body d-flex justify-content-between align-items-center py-4 text-white"
-      >
-        <div>
-          <h6 class="mb-1 opacity-75">Welcome back</h6>
-          <h3 class="fw-bold mb-0">Demo Clinic</h3>
-        </div>
-        <i
-          class="bi bi-heart-pulse-fill"
-          style="font-size: 48px; opacity: 0.85"
-        ></i>
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo"><i class="bi bi-heart-pulse-fill"></i></div>
+        Demo Clinic
       </div>
-    </div>
 
-    <!-- <nav class="navbar navbar-dark bg-primary px-4">
-      <span class="navbar-brand fw-bold">Restore Medical Center</span>
-    </nav> -->
+      <a href="/" class="nav-link-item active"
+        ><i class="bi bi-grid-1x2-fill"></i>Dashboard</a
+      >
+      <a href="/patients" class="nav-link-item"
+        ><i class="bi bi-person-plus-fill"></i>Register Patient</a
+      >
+      <!-- <a href="/patients" class="nav-link-item"
+        ><i class="bi bi-people-fill"></i>Patients</a
+      > -->
+      <a href="/appointments" class="nav-link-item"
+        ><i class="bi bi-calendar-plus-fill"></i>Book Appointment</a
+      >
+      <!-- <a href="/appointments" class="nav-link-item"
+        ><i class="bi bi-calendar-check-fill"></i>Appointments</a
+      >
+      <a href="#" class="nav-link-item"
+        ><i class="bi bi-clipboard2-pulse-fill"></i>Reports</a
+      >
+      <a href="#" class="nav-link-item"
+        ><i class="bi bi-gear-fill"></i>Settings</a -->
+      <!-- > -->
 
-    <!-- Main CONTENT -->
-    <div class="container mt-4">
+      <div class="spacer"></div>
+
+      <!-- LOGOUT: a real button that clears the token via JS -->
+      <a href="#" class="nav-link-item logout-link" id="logoutBtn">
+        <i class="bi bi-box-arrow-right"></i>Logout
+      </a>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ========== MAIN ========== -->
+    <div class="main">
+      <div class="topbar">
+        <button class="hamburger" id="hamburger">
+          <i class="bi bi-list"></i>
+        </button>
+        <div></div>
+      </div>
+
+      <!-- WELCOME -->
+      <div class="welcome">
+        <div>
+          <div class="sub">Welcome back</div>
+          <h3>Demo Clinic</h3>
+        </div>
+        <i class="bi bi-heart-pulse-fill"></i>
+      </div>
+
       <!-- STAT CARDS -->
-      <div class="row g-3">
+      <div class="row g-3 mb-4">
         <div class="col-md-4">
-          <div
-            class="card shadow-sm border-0"
-            style="border-left: 4px solid #0d6efd !important"
-          >
-            <div
-              class="card-body d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <h6 class="text-muted mb-1">Total Patients</h6>
-                <h2 class="fw-bold mb-0" id="total-patients">—</h2>
-              </div>
-              <div class="rounded-circle bg-primary bg-opacity-10 p-3">
-                <i class="bi bi-people-fill fs-4 text-primary"></i>
-              </div>
+          <div class="stat-card" style="border-left-color: #0d6efd">
+            <div>
+              <h6>Total Patients</h6>
+              <h2 id="total-patients">—</h2>
+            </div>
+            <div class="stat-icon" style="background: #eaf1ff; color: #0d6efd">
+              <i class="bi bi-people-fill"></i>
             </div>
           </div>
         </div>
-
         <div class="col-md-4">
-          <div
-            class="card shadow-sm border-0"
-            style="border-left: 4px solid #198754 !important"
-          >
-            <div
-              class="card-body d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <h6 class="text-muted mb-1">Today's Appointments</h6>
-                <h2 class="fw-bold mb-0" id="todays-appointments">—</h2>
-              </div>
-              <div class="rounded-circle bg-success bg-opacity-10 p-3">
-                <i class="bi bi-calendar-check-fill fs-4 text-success"></i>
-              </div>
+          <div class="stat-card" style="border-left-color: #198754">
+            <div>
+              <h6>Today's Appointments</h6>
+              <h2 id="todays-appointments">—</h2>
+            </div>
+            <div class="stat-icon" style="background: #e8f8f0; color: #198754">
+              <i class="bi bi-calendar-check-fill"></i>
             </div>
           </div>
         </div>
-
         <div class="col-md-4">
-          <div
-            class="card shadow-sm border-0"
-            style="border-left: 4px solid #fd7e14 !important"
-          >
-            <div
-              class="card-body d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <h6 class="text-muted mb-1">Total Appointments</h6>
-                <h2 class="fw-bold mb-0" id="total-appointments">—</h2>
-              </div>
-              <div class="rounded-circle bg-warning bg-opacity-10 p-3">
-                <i class="bi bi-clipboard2-pulse-fill fs-4 text-warning"></i>
-              </div>
+          <div class="stat-card" style="border-left-color: #fd7e14">
+            <div>
+              <h6>Total Appointments</h6>
+              <h2 id="total-appointments">—</h2>
+            </div>
+            <div class="stat-icon" style="background: #fff2e6; color: #fd7e14">
+              <i class="bi bi-clipboard2-pulse-fill"></i>
             </div>
           </div>
         </div>
       </div>
 
       <!-- QUICK ACTIONS -->
-      <div class="mt-4">
-        <h5 class="mb-3">Quick Actions</h5>
-        <a href="/patients" class="btn btn-primary btn-lg me-2"
-          ><i class="bi bi-person-plus-fill me-2"></i>Register Patient</a
+      <!-- <h5 class="mb-3 fw-semibold">Quick Actions</h5>
+      <div class="mb-4" style="display: flex; gap: 12px; flex-wrap: wrap">
+        <a href="/patients" class="quick-btn" style="background: #0d6efd"
+          ><i class="bi bi-person-plus-fill"></i>Register Patient</a
         >
-        <a href="/appointments" class="btn btn-success btn-lg"
-          ><i class="bi bi-calendar-plus-fill me-2"></i>Book Appointments</a
+        <a href="/appointments" class="quick-btn" style="background: #198754"
+          ><i class="bi bi-calendar-plus-fill"></i>Book Appointment</a
         >
+      </div> -->
+
+      <!-- QUOTE -->
+      <div id="quote-banner" class="quote-banner mb-4">
+        <p id="quote-text" class="quote-text"></p>
+        <span id="quote-author" class="quote-author"></span>
       </div>
-    </div>
-    <!-- /Quick Actions div closes here -->
 
-    <div id="quote-banner" class="quote-banner">
-      <p id="quote-text" class="quote-text"></p>
-      <span id="quote-author" class="quote-author"></span>
-    </div>
-   
-
-    <div class="row mt-4 mb-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
+      <!-- CALENDAR + MONTHLY -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-7">
+          <div class="panel">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="text-muted mb-0" id="calendarTitle"></h6>
+              <h6 class="mb-0" id="calendarTitle"></h6>
               <div>
                 <button
                   class="btn btn-sm btn-outline-primary me-1"
@@ -180,35 +414,34 @@
             <div id="calendarGrid"></div>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div
-          class="card shadow-sm border-0"
-          style="
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            color: white;
-          "
-        >
-          <div class="card-body">
-            <h6 class="mb-1 opacity-75">Monthly Overview</h6>
+        <div class="col-md-5">
+          <div
+            class="panel"
+            style="
+              background: linear-gradient(135deg, #1a73e8, #0d47a1);
+              color: #fff;
+            "
+          >
+            <h6 class="mb-1" style="color: rgba(255, 255, 255, 0.75)">
+              Monthly Overview
+            </h6>
             <h2 id="monthlyCount" class="fw-bold">0</h2>
-            <p class="opacity-75">appointments this month</p>
+            <p style="opacity: 0.75">appointments this month</p>
             <div id="monthlyList"></div>
           </div>
         </div>
       </div>
-    </div>
 
-     <div class="card shadow-sm border-0 mt-4"></div>
-      <div class="card-body">
-        <h6 class="text-muted mb-3">Patients vs Appointments</h6>
+      <!-- CHART -->
+      <div class="panel mb-4">
+        <h6>Patients vs Appointments</h6>
         <div style="height: 250px">
           <canvas id="statsChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- bootstraps JS -->
+    <!-- ========== SCRIPTS ========== -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
@@ -216,6 +449,21 @@
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- sidebar toggle (mobile) -->
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      document.getElementById("hamburger").addEventListener("click", () => {
+        sidebar.classList.add("open");
+        overlay.classList.add("show");
+      });
+      overlay.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+      });
+    </script>
+
+    <script src="/static/js/auth.js"></script>
     <script src="/static/js/dashboard.js"></script>
   </body>
 </html>

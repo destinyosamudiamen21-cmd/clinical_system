@@ -1,16 +1,25 @@
+const token = localStorage.getItem("access_token");
+if (!token) {
+  window.location.href = "/login";
+}
+document.getElementById("logoutBtn").addEventListener("click", function () {
+  localStorage.removeItem("access_token");
+  window.location.href = "/login";
+});
+
 async function loadDashboardstats() {
-  // Fetch all patients
-  const patientResponse = await fetch("/patient/");
+  // authFetch all patients
+  const patientResponse = await authFetch("/patient/");
   const patients = await patientResponse.json();
   document.getElementById("total-patients").textContent = patients.length;
 
-  // Fetch all Appointments
-  const appointmentResponse = await fetch("/appointment/");
+  // authFetch all Appointments
+  const appointmentResponse = await authFetch("/appointment/");
   const appointments = await appointmentResponse.json();
   document.getElementById("total-appointments").textContent =
     appointments.length;
 
-  // Fetch today's appointments
+  // authFetch today's appointments
   const today = new Date().toISOString().split("T")[0];
   const todayAppointments = appointments.filter((a) =>
     a.appointment_date.startsWith(today)

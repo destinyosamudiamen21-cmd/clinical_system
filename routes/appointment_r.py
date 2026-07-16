@@ -44,7 +44,7 @@ def update_appointment(
     appointment_id:int, 
     appointment: AppointmentCreate, 
     session: Session = Depends(get_session),
-    current_user:dict = Depends(get_current_user)
+    current_user:dict = Depends(RoleChecker(["admin"]))
     ):
     return manager.update_appointment(appointment_id,appointment.model_dump() ,session)
 

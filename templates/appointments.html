@@ -112,6 +112,14 @@
               class="form-control mb-2"
               placeholder="Reason for visit"
             />
+
+            <!-- NEW: payment PIN required to book -->
+            <input
+              type="text"
+              id="bookingPin"
+              class="form-control mb-2"
+              placeholder="Payment PIN (from confirmed payment)"
+            />
           </div>
 
           <div class="modal-footer">
@@ -185,7 +193,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="/static/js/auth.js"></script>
     <script src="/static/js/appointments.js"></script>
   </body>
 </html>
