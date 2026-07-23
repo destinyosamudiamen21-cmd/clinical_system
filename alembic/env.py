@@ -21,6 +21,15 @@ from models.appointment import Appointment
 from models.consultation_fee import ConsultationFee
 from models.pin import Payment
 from auth.model import User
+from models.encounter import Encounter
+from models.clerking_note import ClerkingNote
+from models.vital_signs import VitalSigns
+from models.nursing_assessment import NursingAssessment
+from models.progress_notes import ProgressNote
+from models.medication_chart import MedicationChart
+from models.Fluid_bal_chart import FluidBalance
+from models.procedure_note import ProcedureNote
+from models.discharge_sum import DischargeSummary
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 

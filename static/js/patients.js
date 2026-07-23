@@ -205,6 +205,11 @@ async function openViewModal(patientId) {
 
   document.getElementById("editFromViewBtn").onclick = () => openEditModal(p);
   new bootstrap.Modal(document.getElementById("viewPatientModal")).show();
+
+  // Wire up "Clinical Records" button (add this button to the modal footer in HTML)
+  document.getElementById("clinicalRecordsBtn").onclick = () => {
+    window.location.href = `/encounter-page/${p.id}`; // go to that patient's encounters
+  };
 }
 
 // Open Edit Patient Modal

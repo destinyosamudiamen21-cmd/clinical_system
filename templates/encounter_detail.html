@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encounter — Demo Clinic</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-primary px-4">
+      <span class="navbar-brand fw-bold">Encounter Details</span>
+      <a href="#" onclick="history.back()" class="btn btn-outline-light btn-sm"
+        >Back</a
+      >
+    </nav>
+
+    <div class="container mt-4">
+      <!-- ===== TABS ===== -->
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+          <a class="nav-link active" href="#" onclick="showTab('clerking')"
+            >Clerking</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('vitals')">Vitals</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('nursing')">Nursing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('progress')"
+            >Progress</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('medication')"
+            >Medication</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('fluid')"
+            >Fluid Balance</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('procedure')"
+            >Procedure</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('discharge')"
+            >Discharge</a
+          >
+        </li>
+      </ul>
+
+      <!-- ===== CLERKING ===== -->
+      <div id="clerkingSection" class="doc-section">
+        <div id="clerkingView"></div>
+        <div id="clerkingForm" style="display: none">
+          <h5 class="mb-3">Doctor's Clerking</h5>
+          <div class="mb-2">
+            <label class="form-label">Presenting Complaints</label
+            ><textarea class="form-control" id="c_complaints"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">History</label
+            ><textarea class="form-control" id="c_history"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Examination</label
+            ><textarea class="form-control" id="c_examination"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Assessment</label
+            ><textarea class="form-control" id="c_assessment"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Diagnosis</label
+            ><textarea class="form-control" id="c_diagnosis"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Investigations</label
+            ><textarea class="form-control" id="c_investigations"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Treatment Plan</label
+            ><textarea class="form-control" id="c_treatment"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Follow up</label
+            ><textarea class="form-control" id="c_followup"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveClerkingBtn">
+            Save Clerking Note
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== VITALS ===== -->
+      <div id="vitalsSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Vital Signs</h5>
+          <button class="btn btn-primary btn-sm" id="showVitalsFormBtn">
+            + Record Vitals
+          </button>
+        </div>
+        <div class="row g-3 mb-4" id="vitalsCards"></div>
+        <h6 class="text-muted">Previous Readings</h6>
+        <div id="vitalsHistory" class="mb-4"></div>
+        <div id="vitalsForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">Record New Vitals</h6>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <label class="form-label small">Temperature (°C)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="v_temperature"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Pulse (bpm)</label
+              ><input type="number" class="form-control" id="v_pulse" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Respiratory Rate</label
+              ><input
+                type="number"
+                class="form-control"
+                id="v_respiratory_rate"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Blood Pressure</label
+              ><input
+                type="text"
+                class="form-control"
+                id="v_blood_pressure"
+                placeholder="120/80"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">SpO₂ (%)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="v_spo2"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Weight (kg)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="v_weight"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Height (cm)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="v_height"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">BMI</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="v_bmi"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Pain Score (0-10)</label
+              ><input type="number" class="form-control" id="v_pain_score" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-sm" id="saveVitalsBtn">
+              Save
+            </button>
+            <button class="btn btn-secondary btn-sm" id="cancelVitalsBtn">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NURSING ===== -->
+      <div id="nursingSection" class="doc-section" style="display: none">
+        <div id="nursingView"></div>
+        <div id="nursingForm" style="display: none">
+          <h5 class="mb-3">Nursing Assessment</h5>
+          <div class="mb-2">
+            <label class="form-label">Chief Complaint</label
+            ><textarea class="form-control" id="n_chief_complaint"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Nursing Assessment</label
+            ><textarea
+              class="form-control"
+              id="n_nursing_assessment"
+            ></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Nursing Diagnosis</label
+            ><textarea class="form-control" id="n_nursing_diagnosis"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Care Plan</label
+            ><textarea class="form-control" id="n_care_plan"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Evaluation</label
+            ><textarea class="form-control" id="n_evaluation"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveNursingBtn">
+            Save Nursing Assessment
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PROGRESS ===== -->
+      <div id="progressSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Progress Notes (SOAP)</h5>
+          <button class="btn btn-primary btn-sm" id="showProgressFormBtn">
+            + Add Note
+          </button>
+        </div>
+        <div id="progressList" class="mb-4"></div>
+        <div id="progressForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">New Progress Note</h6>
+          <div class="mb-2">
+            <label class="form-label small">Subjective</label
+            ><textarea class="form-control" id="p_subjective"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Objective</label
+            ><textarea class="form-control" id="p_objective"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Assessment</label
+            ><textarea class="form-control" id="p_assessment"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Plan</label
+            ><textarea class="form-control" id="p_plan"></textarea>
+          </div>
+          <button class="btn btn-success btn-sm" id="saveProgressBtn">
+            Save
+          </button>
+          <button class="btn btn-secondary btn-sm" id="cancelProgressBtn">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== MEDICATION ===== -->
+      <div id="medicationSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Medication Chart</h5>
+          <button class="btn btn-primary btn-sm" id="showMedFormBtn">
+            + Add Drug
+          </button>
+        </div>
+        <div class="row g-3 mb-4" id="medicationList"></div>
+        <div id="medicationForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">Add Medication</h6>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label small">Drug</label
+              ><input type="text" class="form-control" id="m_drug" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Dose</label
+              ><input type="text" class="form-control" id="m_dose" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Route</label
+              ><input
+                type="text"
+                class="form-control"
+                id="m_route"
+                placeholder="oral, IV..."
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Frequency</label
+              ><input
+                type="text"
+                class="form-control"
+                id="m_frequency"
+                placeholder="BD, TDS..."
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Start Date</label
+              ><input
+                type="datetime-local"
+                class="form-control"
+                id="m_start_date"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Stop Date</label
+              ><input
+                type="datetime-local"
+                class="form-control"
+                id="m_stop_date"
+              />
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-sm" id="saveMedBtn">Save</button>
+            <button class="btn btn-secondary btn-sm" id="cancelMedBtn">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FLUID BALANCE ===== -->
+      <div id="fluidSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Fluid Balance Chart</h5>
+          <button class="btn btn-primary btn-sm" id="showFluidFormBtn">
+            + Add Entry
+          </button>
+        </div>
+        <div class="row g-3 mb-4" id="fluidSummary"></div>
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Time</th>
+                  <th>Intake (ml)</th>
+                  <th>Output (ml)</th>
+                  <th>Balance (ml)</th>
+                </tr>
+              </thead>
+              <tbody id="fluidTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="fluidForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">New Fluid Entry</h6>
+          <div class="row g-2">
+            <div class="col-md-3">
+              <label class="form-label small">Time</label
+              ><input type="datetime-local" class="form-control" id="f_time" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Intake (ml)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="f_intake"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Output (ml)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="f_output"
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small">Balance (ml)</label
+              ><input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="f_balance"
+              />
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-sm" id="saveFluidBtn">
+              Save
+            </button>
+            <button class="btn btn-secondary btn-sm" id="cancelFluidBtn">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PROCEDURE ===== -->
+      <div id="procedureSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Procedure Notes</h5>
+          <button class="btn btn-primary btn-sm" id="showProcedureFormBtn">
+            + Add Procedure
+          </button>
+        </div>
+        <div id="procedureList" class="mb-4"></div>
+        <div id="procedureForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">New Procedure Note</h6>
+          <div class="mb-2">
+            <label class="form-label small">Indication</label
+            ><textarea class="form-control" id="pr_indication"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Procedure</label
+            ><textarea class="form-control" id="pr_procedure"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Findings</label
+            ><textarea class="form-control" id="pr_findings"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Complications</label
+            ><textarea
+              class="form-control"
+              id="pr_complications"
+              placeholder="None, if applicable"
+            ></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Plan</label
+            ><textarea class="form-control" id="pr_plan"></textarea>
+          </div>
+          <button class="btn btn-success btn-sm" id="saveProcedureBtn">
+            Save
+          </button>
+          <button class="btn btn-secondary btn-sm" id="cancelProcedureBtn">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== DISCHARGE ===== -->
+      <div id="dischargeSection" class="doc-section" style="display: none">
+        <div id="dischargeView"></div>
+        <div id="dischargeForm" style="display: none">
+          <h5 class="mb-3">Discharge Summary</h5>
+          <div class="mb-2">
+            <label class="form-label">Diagnosis</label
+            ><textarea class="form-control" id="d_diagnosis"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Hospital Course</label
+            ><textarea class="form-control" id="d_hospital_course"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Discharge Medications</label
+            ><textarea
+              class="form-control"
+              id="d_discharge_medications"
+            ></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Follow-up</label
+            ><textarea class="form-control" id="d_follow_up"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveDischargeBtn">
+            Save Discharge Summary
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- /container -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/encounter_details.js"></script>
+  </body>
+</html>
