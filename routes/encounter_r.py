@@ -22,6 +22,39 @@ def get_encounter(
     )
     return encounter
 
+@encounter_router.patch("/{encounter_id}/archive")
+def archive_encounter(
+    encounter_id: int,
+    session: Session = Depends(get_session),
+    current_user = Depends(RoleChecker(["admin"]))
+):
+    encounter = manager.archive_encounter(encounter_id, session)
+    if not encounter:
+        raise HTTPException(status_code=404, detail="Encounter not found")
+    return {"message": "Encounter archived"}
+
+
+@encounter_router.patch("/{encounter_id}/restore")
+def restore_encounter(
+    encounter_id: int,
+    session: Session = Depends(get_session),
+    current_user = Depends(RoleChecker(["admin"]))
+):
+    encounter = manager.restore_encounter(encounter_id, session)
+    if not encounter:
+        raise HTTPException(status_code=404, detail="Encounter not found")
+    return {"message": "Encounter restored"}
+
+
+@encounter_router.get("/patient/{patient_id}/archived")
+def get_archived(
+    patient_id: int,
+    session: Session = Depends(get_session),
+    current_user = Depends(RoleChecker(["admin"]))
+):
+    return manager.get_archived_encounters(patient_id, session)
+
+
 @encounter_router.get("/patient/{patient_id}")
 def get_patient_encounter(
     patient_id:int,

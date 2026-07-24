@@ -18,6 +18,14 @@ def search_by_name(
     ):
     return manager.search_by_name(name, session)
 
+# MUST come BEFORE the /{patient_id} route
+@patient_router.get("/archived")
+def list_archived(
+    session: Session = Depends(get_session),
+    current_user = Depends(RoleChecker(["admin"]))
+):
+    return manager.list_archived_patients(session)
+
 @patient_router.get("/{patient_id}")
 def get_patient(
     patient_id:int, 
@@ -57,4 +65,18 @@ def delete_patient(
     patient_id:int, 
     session: Session=Depends(get_session),
     current_user = Depends(RoleChecker(["admin"]))):
-    return manager.remove_patient(patient_id, session)
+    patient = manager.remove_patient(patient_id, session)
+    if not patient:
+       raise HTTPException(status_code=404, detail="Patient not found")
+    return {"message": "Patient archived"}
+
+@patient_router.post("/{patient_id}/restore")
+def restore_patient(
+    patient_id: int,
+    session: Session = Depends(get_session),
+    current_user = Depends(RoleChecker(["admin"]))
+):
+    patient = manager.restore_patient(patient_id, session)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return {"message": "Patient restored"}

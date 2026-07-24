@@ -71,7 +71,8 @@ searchInput.addEventListener("input", async function () {
 
 // Delete patient
 async function deletePatient(id) {
-  if (!window.confirm("Delete this patient?")) return;
+  if (!window.confirm("Archive this patient? They can be restored later"))
+    return;
   const response = await authFetch(`/patient/${id}`, { method: "DELETE" });
   if (!response) return;
   loadPatients();
@@ -271,3 +272,63 @@ async function savePatientUpdate() {
 document
   .getElementById("saveEditBtn")
   .addEventListener("click", savePatientUpdate);
+
+let showingArchived = false;
+
+document.getElementById("viewArchivedBtn").onclick = async function () {
+  showingArchived = !showingArchived;
+  this.textContent = showingArchived ? "View Active" : "View Archived";
+  if (showingArchived) {
+    loadArchived();
+  } else {
+    loadPatients();
+  }
+};
+
+async function loadArchived() {
+  const response = await authFetch("/patient/archived");
+  if (!response || !response.ok) {
+    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Could not load archived patients.</td></tr>`;
+    return;
+  }
+  const patients = await response.json();
+  renderArchived(patients);
+}
+
+function renderArchived(patients) {
+  tableBody.innerHTML = "";
+  if (!Array.isArray(patients) || patients.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No archived patients.</td></tr>`;
+    return;
+  }
+  patients.forEach((p) => {
+    tableBody.innerHTML += `
+      <tr class="table-secondary">
+        <td>${p.id}</td>
+        <td>${p.full_name}</td>
+        <td>${p.age}</td>
+        <td>${p.gender}</td>
+        <td>${p.phone_number}</td>
+        <td>
+          <button class="btn btn-sm btn-success" onclick="restorePatient(${p.id})">Restore</button>
+        </td>
+      </tr>`;
+  });
+}
+
+async function restorePatient(id) {
+  if (!confirm("Restore this patient?")) return;
+  const response = await authFetch(`/patient/${id}/restore`, {
+    method: "POST",
+  });
+  if (!response) return;
+  if (response.status === 403) {
+    alert("Only admins can restore patients.");
+    return;
+  }
+  if (response.ok) {
+    loadArchived();
+  } else {
+    alert("Could not restore patient.");
+  }
+}
