@@ -124,3 +124,20 @@ els.password.addEventListener("keydown", (e) => {
 els.email.addEventListener("keydown", (e) => {
   if (e.key === "Enter") handleSubmit();
 });
+
+document.getElementById("forgotLink").onclick = async function (e) {
+  e.preventDefault();
+  const email = els.email.value.trim();
+  if (!email) {
+    showMsg("Enter your email first, then click Forgot password.", "error");
+    return;
+  }
+
+  const res = await fetch("/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email }),
+  });
+  const data = await res.json();
+  showMsg(data.message, "success");
+};

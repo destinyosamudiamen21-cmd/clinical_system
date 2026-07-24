@@ -58,6 +58,12 @@ def encounter_detail_page(encounter_id: int):
 def encounter_detail_page(patient_id: int):
     with open("templates/encounters.html") as file:
         return HTMLResponse(content=file.read())
+    
+@app.get("/reset-password", include_in_schema=False)
+def reset_password_page():
+    with open("templates/reset_password.html") as f:
+        return HTMLResponse(content=f.read())
+
 
 
 app.include_router(

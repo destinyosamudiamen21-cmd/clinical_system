@@ -245,6 +245,17 @@
         color: var(--muted);
         text-decoration: none;
       }
+      .forgot-link {
+        color: #43c8d9; /* Your teal brand color */
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+      }
+
+      .forgot-link:hover {
+        color: #2aa8b8;
+        text-decoration: underline;
+      }
       @media (max-width: 900px) {
         .left {
           display: none;
@@ -367,6 +378,9 @@
           <span>I agree to the <a href="#">Terms &amp; Conditions</a></span>
         </div>
         <button class="cta" id="submitBtn">Log In</button>
+        <p class="text-end mb-3">
+          <a href="#" id="forgotLink" class="forgot-link"> Forgot password? </a>
+        </p>
         <p class="switch-line" id="switchLine">
           Don't have an account? <a id="switchLink">Sign up</a>
         </p>
