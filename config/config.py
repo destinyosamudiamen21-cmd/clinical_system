@@ -14,6 +14,7 @@ class Setting(BaseSettings):
 
     RESEND_API_KEY: str
     MAIL_FROM: str = "onboarding@resend.dev"
+    FRONTEND_URL: str = "http://127.0.0.1:8000"
 
 
 
