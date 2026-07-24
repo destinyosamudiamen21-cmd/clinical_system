@@ -1,20 +1,17 @@
-import smtplib
-from email.message import EmailMessage
+import resend
 from config.config import config
 
-def send_reset_email(to_email: str, reset_link: str):
-    msg = EmailMessage()
-    msg["Subject"] = "Reset your password"
-    msg["From"] = config.MAIL_FROM
-    msg["To"] = to_email
-    msg.set_content(
-        f"You requested a password reset.\n\n"
-        f"Click the link below to set a new password. It expires in 1 hour.\n\n"
-        f"{reset_link}\n\n"
-        f"If you didn't request this, ignore this email."
-    )
+resend.api_key = config.RESEND_API_KEY
 
-    with smtplib.SMTP(config.MAIL_SERVER, config.MAIL_PORT) as server:
-        server.starttls()
-        server.login(config.MAIL_USERNAME, config.MAIL_PASSWORD)
-        server.send_message(msg)
+def send_reset_email(to_email: str, reset_link: str):
+    resend.Emails.send({
+        "from": config.MAIL_FROM,
+        "to": to_email,
+        "subject": "Reset your password",
+        "html": f"""
+            <p>You requested a password reset.</p>
+            <p>Click the link below to set a new password. It expires in 1 hour.</p>
+            <p><a href="{reset_link}">Reset my password</a></p>
+            <p>If you didn't request this, ignore this email.</p>
+        """,
+    })

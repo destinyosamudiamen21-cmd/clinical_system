@@ -12,12 +12,9 @@ class Setting(BaseSettings):
         extra="ignore"
     )
 
-    MAIL_SERVER: str = "smtp.gmail.com"
-    MAIL_PORT: int = 587
-    MAIL_USERNAME: str          # required — your gmail address
-    MAIL_PASSWORD: str          # required — the App Password (SECRET)
-    MAIL_FROM: str              # required — the from address
-    FRONTEND_URL: str = "http://127.0.0.1:8000"   # base for building reset links
+    RESEND_API_KEY: str
+    MAIL_FROM: str = "onboarding@resend.dev"
+
 
 
 config = Setting()
