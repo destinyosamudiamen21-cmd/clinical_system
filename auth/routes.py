@@ -74,7 +74,8 @@ def forgot_password(data: ForgotPasswordRequest, session: Session = Depends(get_
         try:
             send_reset_email(user.email, link)
         except Exception:
-            pass   # don't leak whether sending succeeded
+            print(f"EMAIL SEND FAILED: {"e"}")
+          # don't leak whether sending succeeded
 
     # ALWAYS the same response, whether or not the email exists
     return {"message": "If that email is registered, a reset link has been sent."}
