@@ -53,3 +53,24 @@ class EncounterManager():
                 Encounter.status == "archived"
             )
         ).all()
+    
+    def get_doctor_queue(self, session: Session):
+        return session.exec(
+            select(Encounter).where(
+                Encounter.workflow_status == "awaiting_doctor"
+            )
+        ).all()
+    
+    def advance_workflow(self, encounter_id, new_status, session: Session, only_if=None):
+        """Move an encounter to a new workflow stage.
+        If only_if is given, only advance when current status matches it."""
+        encounter = session.get(Encounter, encounter_id)
+        if not encounter:
+            return None
+        if only_if is not None and encounter.workflow_status != only_if:
+            return encounter   # not in the expected stage, leave it alone
+        encounter.workflow_status = new_status
+        session.add(encounter)
+        session.commit()
+        session.refresh(encounter)
+        return encounter

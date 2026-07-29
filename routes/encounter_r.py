@@ -22,6 +22,13 @@ def get_encounter(
     )
     return encounter
 
+@encounter_router.get("/queue")
+def doctor_queue(
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(RoleChecker(["doctor", "admin"]))
+):
+    return manager.get_doctor_queue(session)
+
 @encounter_router.patch("/{encounter_id}/archive")
 def archive_encounter(
     encounter_id: int,

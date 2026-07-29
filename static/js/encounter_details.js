@@ -1,6 +1,25 @@
 const encounterId = window.location.pathname.split("/").pop();
 
-// Load the clerking note for this encounter (if it exists)
+// ---------- TAB SWITCHING ----------
+function showTab(tab) {
+  document
+    .querySelectorAll(".doc-section")
+    .forEach((s) => (s.style.display = "none"));
+  document.getElementById(tab + "Section").style.display = "block";
+  if (tab === "clerking") {
+    loadClerking();
+    loadClerkingVitals();
+  }
+  if (tab === "vitals") loadVitals();
+  if (tab === "nursing") loadNursing();
+  if (tab === "progress") loadProgress();
+  if (tab === "medication") loadMedication();
+  if (tab === "fluid") loadFluid();
+  if (tab === "procedure") loadProcedure();
+  if (tab === "discharge") loadDischarge();
+}
+
+// ---------- CLERKING ----------
 async function loadClerking() {
   const response = await authFetch(`/clerking/${encounterId}`);
   if (!response) return;
@@ -10,7 +29,6 @@ async function loadClerking() {
   const formDiv = document.getElementById("clerkingForm");
 
   if (note && note.id) {
-    // A clerking note exists -> show it (read-only view)
     viewDiv.innerHTML = `
       <div class="card"><div class="card-body">
         <p><strong>Presenting Complaints:</strong> ${note.presenting_complaints}</p>
@@ -24,13 +42,43 @@ async function loadClerking() {
       </div></div>`;
     formDiv.style.display = "none";
   } else {
-    // No note yet -> show the form to write one
     viewDiv.innerHTML = `<p class="text-muted">No clerking note yet.</p>`;
     formDiv.style.display = "block";
   }
 }
 
-// Save a new clerking note
+// Show the nurse's latest vitals on the clerking tab (read-only) to guide the doctor
+async function loadClerkingVitals() {
+  const response = await authFetch(`/vitals/${encounterId}`);
+  if (!response || !response.ok) return;
+  const readings = await response.json();
+
+  const box = document.getElementById("clerkingVitalsSummary");
+  if (!Array.isArray(readings) || readings.length === 0) {
+    box.innerHTML = `<div class="alert alert-light border mb-3">No vitals recorded yet for this visit.</div>`;
+    return;
+  }
+
+  const v = readings[readings.length - 1];
+  box.innerHTML = `
+    <div class="card border-info mb-3">
+      <div class="card-body py-2">
+        <small class="text-muted d-block mb-1">Latest vitals (recorded by nursing)</small>
+        <span class="me-3"><strong>Temp:</strong> ${
+          v.temperature ?? "—"
+        }°C</span>
+        <span class="me-3"><strong>Pulse:</strong> ${v.pulse ?? "—"}</span>
+        <span class="me-3"><strong>BP:</strong> ${
+          v.blood_pressure ?? "—"
+        }</span>
+        <span class="me-3"><strong>SpO₂:</strong> ${v.spo2 ?? "—"}%</span>
+        <span class="me-3"><strong>RR:</strong> ${
+          v.respiratory_rate ?? "—"
+        }</span>
+      </div>
+    </div>`;
+}
+
 document.getElementById("saveClerkingBtn").onclick = async function () {
   const body = {
     encounter_id: parseInt(encounterId),
@@ -50,38 +98,18 @@ document.getElementById("saveClerkingBtn").onclick = async function () {
     body: JSON.stringify(body),
   });
   if (!response) return;
-
   if (response.status === 403) {
     alert("Only doctors can write clerking notes.");
     return;
   }
   if (response.ok) {
-    loadClerking(); // refresh -> now shows the saved note
+    loadClerking();
   } else {
     alert("Could not save clerking note.");
   }
 };
 
-loadClerking();
-
-// ---------- TAB SWITCHING ----------
-function showTab(tab) {
-  document
-    .querySelectorAll(".doc-section")
-    .forEach((s) => (s.style.display = "none"));
-  document.getElementById(tab + "Section").style.display = "block";
-  if (tab === "clerking") loadClerking();
-  if (tab === "vitals") loadVitals();
-  if (tab === "nursing") loadNursing();
-  if (tab === "progress") loadProgress();
-  if (tab === "medication") loadMedication();
-  if (tab === "fluid") loadFluid();
-  if (tab === "procedure") loadProcedure();
-  if (tab === "discharge") loadDischarge();
-}
-
 // ---------- VITALS ----------
-// Simple status logic: returns "Normal" / "High" / "Low" + a bootstrap color
 function vitalStatus(type, value) {
   if (value == null || value === "") return { label: "—", color: "secondary" };
   const ranges = {
@@ -92,7 +120,7 @@ function vitalStatus(type, value) {
     pain_score: [0, 3],
   };
   const r = ranges[type];
-  if (!r) return { label: "", color: "light" }; // no range (weight, height, bmi, bp)
+  if (!r) return { label: "", color: "light" };
   if (value < r[0]) return { label: "Low", color: "warning" };
   if (value > r[1]) return { label: "High", color: "danger" };
   return { label: "Normal", color: "success" };
@@ -129,7 +157,6 @@ async function loadVitals() {
     return;
   }
 
-  // newest reading -> show in cards
   const latest = readings[readings.length - 1];
   cards.innerHTML =
     vitalCard(
@@ -175,7 +202,6 @@ async function loadVitals() {
       vitalStatus("pain_score", latest.pain_score)
     );
 
-  // history table of all readings
   history.innerHTML = `
     <table class="table table-sm">
       <thead><tr><th>Time</th><th>Temp</th><th>Pulse</th><th>BP</th><th>SpO₂</th></tr></thead>
@@ -196,7 +222,6 @@ async function loadVitals() {
     </table>`;
 }
 
-// show/hide the form
 document.getElementById("showVitalsFormBtn").onclick = () => {
   document.getElementById("vitalsForm").style.display = "block";
 };
@@ -204,13 +229,11 @@ document.getElementById("cancelVitalsBtn").onclick = () => {
   document.getElementById("vitalsForm").style.display = "none";
 };
 
-// save new vitals
 document.getElementById("saveVitalsBtn").onclick = async function () {
   const num = (id) => {
     const v = document.getElementById(id).value;
     return v === "" ? null : parseFloat(v);
   };
-
   const body = {
     encounter_id: parseInt(encounterId),
     temperature: num("v_temperature"),
@@ -223,27 +246,25 @@ document.getElementById("saveVitalsBtn").onclick = async function () {
     bmi: num("v_bmi"),
     pain_score: num("v_pain_score"),
   };
-
   const response = await authFetch("/vitals/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response) return;
-
   if (response.status === 403) {
     alert("You don't have permission to record vitals.");
     return;
   }
   if (response.ok) {
     document.getElementById("vitalsForm").style.display = "none";
-    loadVitals(); // refresh -> new reading appears
+    loadVitals();
   } else {
     alert("Could not save vitals.");
   }
 };
 
-// ---------- NURSING (one-per-encounter, like clerking) ----------
+// ---------- NURSING ----------
 async function loadNursing() {
   const response = await authFetch(`/nursing/${encounterId}`);
   if (!response) return;
@@ -277,14 +298,12 @@ document.getElementById("saveNursingBtn").onclick = async function () {
     care_plan: document.getElementById("n_care_plan").value,
     evaluation: document.getElementById("n_evaluation").value,
   };
-
   const response = await authFetch("/nursing/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response) return;
-
   if (response.status === 403) {
     alert("You don't have permission to write a nursing assessment.");
     return;
@@ -296,7 +315,7 @@ document.getElementById("saveNursingBtn").onclick = async function () {
   }
 };
 
-// ---------- PROGRESS NOTES (list pattern) ----------
+// ---------- PROGRESS NOTES ----------
 async function loadProgress() {
   const response = await authFetch(`/progress/${encounterId}`);
   if (!response) return;
@@ -308,7 +327,6 @@ async function loadProgress() {
     return;
   }
 
-  // newest first, each note as a card
   list.innerHTML = notes
     .slice()
     .reverse()
@@ -366,23 +384,18 @@ document.getElementById("saveProgressBtn").onclick = async function () {
   }
 };
 
-// ---------- MEDICATION (list pattern, card display) ----------
+// ---------- MEDICATION ----------
 async function loadMedication() {
   const response = await authFetch(`/medication/${encounterId}`);
   if (!response) return;
-
   if (!response.ok) {
-    // ← handle 404/error
     document.getElementById(
       "medicationList"
     ).innerHTML = `<p class="text-muted">Could not load medications.</p>`;
     return;
   }
-
   const meds = await response.json();
-
   if (!Array.isArray(meds) || meds.length === 0) {
-    // ← guard against non-array
     document.getElementById(
       "medicationList"
     ).innerHTML = `<p class="text-muted">No medications prescribed yet.</p>`;
@@ -461,7 +474,7 @@ document.getElementById("saveMedBtn").onclick = async function () {
   }
 };
 
-// ---------- FLUID BALANCE (list, with running totals) ----------
+// ---------- FLUID BALANCE ----------
 async function loadFluid() {
   const response = await authFetch(`/fluid/${encounterId}`);
   if (!response || !response.ok) return;
@@ -542,7 +555,7 @@ document.getElementById("saveFluidBtn").onclick = async function () {
   }
 };
 
-// ---------- PROCEDURE (list, cards) ----------
+// ---------- PROCEDURE ----------
 async function loadProcedure() {
   const response = await authFetch(`/procedure/${encounterId}`);
   if (!response || !response.ok) return;
@@ -616,7 +629,7 @@ document.getElementById("saveProcedureBtn").onclick = async function () {
   }
 };
 
-// ---------- DISCHARGE (one per encounter, like clerking) ----------
+// ---------- DISCHARGE ----------
 async function loadDischarge() {
   const response = await authFetch(`/discharge/${encounterId}`);
   if (!response || !response.ok) return;
@@ -666,3 +679,6 @@ document.getElementById("saveDischargeBtn").onclick = async function () {
     alert("Could not save discharge summary.");
   }
 };
+
+// ---------- INITIAL LOAD ----------
+showTab("vitals");

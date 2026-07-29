@@ -12,6 +12,7 @@ class Encounter(SQLModel, table=True):
     ward_clinic: Optional[str] =  None
     status: str = Field(default="open")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    workflow_status: str = Field(default="awaiting_vitals")
 
 class EncounterCreate(SQLModel):
     patient_id: int = Field(foreign_key="patient.id")

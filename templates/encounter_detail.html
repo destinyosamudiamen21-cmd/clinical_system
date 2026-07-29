@@ -19,15 +19,17 @@
     </nav>
 
     <div class="container mt-4">
-      <!-- ===== TABS ===== -->
+      <!-- ===== TABS (workflow order) ===== -->
       <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
-          <a class="nav-link active" href="#" onclick="showTab('clerking')"
-            >Clerking</a
+          <a class="nav-link active" href="#" onclick="showTab('vitals')"
+            >Vitals</a
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="showTab('vitals')">Vitals</a>
+          <a class="nav-link" href="#" onclick="showTab('clerking')"
+            >Clerking</a
+          >
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('nursing')">Nursing</a>
@@ -35,6 +37,11 @@
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('progress')"
             >Progress</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('procedure')"
+            >Procedure</a
           >
         </li>
         <li class="nav-item">
@@ -48,62 +55,14 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="showTab('procedure')"
-            >Procedure</a
-          >
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('discharge')"
             >Discharge</a
           >
         </li>
       </ul>
 
-      <!-- ===== CLERKING ===== -->
-      <div id="clerkingSection" class="doc-section">
-        <div id="clerkingView"></div>
-        <div id="clerkingForm" style="display: none">
-          <h5 class="mb-3">Doctor's Clerking</h5>
-          <div class="mb-2">
-            <label class="form-label">Presenting Complaints</label
-            ><textarea class="form-control" id="c_complaints"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">History</label
-            ><textarea class="form-control" id="c_history"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Examination</label
-            ><textarea class="form-control" id="c_examination"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Assessment</label
-            ><textarea class="form-control" id="c_assessment"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Diagnosis</label
-            ><textarea class="form-control" id="c_diagnosis"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Investigations</label
-            ><textarea class="form-control" id="c_investigations"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Treatment Plan</label
-            ><textarea class="form-control" id="c_treatment"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Follow up</label
-            ><textarea class="form-control" id="c_followup"></textarea>
-          </div>
-          <button class="btn btn-primary" id="saveClerkingBtn">
-            Save Clerking Note
-          </button>
-        </div>
-      </div>
-
       <!-- ===== VITALS ===== -->
-      <div id="vitalsSection" class="doc-section" style="display: none">
+      <div id="vitalsSection" class="doc-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="mb-0">Vital Signs</h5>
           <button class="btn btn-primary btn-sm" id="showVitalsFormBtn">
@@ -198,6 +157,50 @@
         </div>
       </div>
 
+      <!-- ===== CLERKING ===== -->
+      <div id="clerkingSection" class="doc-section" style="display: none">
+        <div id="clerkingVitalsSummary" class="mb-3"></div>
+        <div id="clerkingView"></div>
+        <div id="clerkingForm" style="display: none">
+          <h5 class="mb-3">Doctor's Clerking</h5>
+          <div class="mb-2">
+            <label class="form-label">Presenting Complaints</label
+            ><textarea class="form-control" id="c_complaints"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">History</label
+            ><textarea class="form-control" id="c_history"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Examination</label
+            ><textarea class="form-control" id="c_examination"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Assessment</label
+            ><textarea class="form-control" id="c_assessment"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Diagnosis</label
+            ><textarea class="form-control" id="c_diagnosis"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Investigations</label
+            ><textarea class="form-control" id="c_investigations"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Treatment Plan</label
+            ><textarea class="form-control" id="c_treatment"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Follow up</label
+            ><textarea class="form-control" id="c_followup"></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveClerkingBtn">
+            Save Clerking Note
+          </button>
+        </div>
+      </div>
+
       <!-- ===== NURSING ===== -->
       <div id="nursingSection" class="doc-section" style="display: none">
         <div id="nursingView"></div>
@@ -263,6 +266,50 @@
             Save
           </button>
           <button class="btn btn-secondary btn-sm" id="cancelProgressBtn">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PROCEDURE ===== -->
+      <div id="procedureSection" class="doc-section" style="display: none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Procedure Notes</h5>
+          <button class="btn btn-primary btn-sm" id="showProcedureFormBtn">
+            + Add Procedure
+          </button>
+        </div>
+        <div id="procedureList" class="mb-4"></div>
+        <div id="procedureForm" class="card p-3" style="display: none">
+          <h6 class="mb-3">New Procedure Note</h6>
+          <div class="mb-2">
+            <label class="form-label small">Indication</label
+            ><textarea class="form-control" id="pr_indication"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Procedure</label
+            ><textarea class="form-control" id="pr_procedure"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Findings</label
+            ><textarea class="form-control" id="pr_findings"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Complications</label
+            ><textarea
+              class="form-control"
+              id="pr_complications"
+              placeholder="None, if applicable"
+            ></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Plan</label
+            ><textarea class="form-control" id="pr_plan"></textarea>
+          </div>
+          <button class="btn btn-success btn-sm" id="saveProcedureBtn">
+            Save
+          </button>
+          <button class="btn btn-secondary btn-sm" id="cancelProcedureBtn">
             Cancel
           </button>
         </div>
@@ -399,50 +446,6 @@
               Cancel
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- ===== PROCEDURE ===== -->
-      <div id="procedureSection" class="doc-section" style="display: none">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">Procedure Notes</h5>
-          <button class="btn btn-primary btn-sm" id="showProcedureFormBtn">
-            + Add Procedure
-          </button>
-        </div>
-        <div id="procedureList" class="mb-4"></div>
-        <div id="procedureForm" class="card p-3" style="display: none">
-          <h6 class="mb-3">New Procedure Note</h6>
-          <div class="mb-2">
-            <label class="form-label small">Indication</label
-            ><textarea class="form-control" id="pr_indication"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Procedure</label
-            ><textarea class="form-control" id="pr_procedure"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Findings</label
-            ><textarea class="form-control" id="pr_findings"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Complications</label
-            ><textarea
-              class="form-control"
-              id="pr_complications"
-              placeholder="None, if applicable"
-            ></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Plan</label
-            ><textarea class="form-control" id="pr_plan"></textarea>
-          </div>
-          <button class="btn btn-success btn-sm" id="saveProcedureBtn">
-            Save
-          </button>
-          <button class="btn btn-secondary btn-sm" id="cancelProcedureBtn">
-            Cancel
-          </button>
         </div>
       </div>
 

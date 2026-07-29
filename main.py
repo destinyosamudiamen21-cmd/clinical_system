@@ -63,6 +63,11 @@ def encounter_detail_page(patient_id: int):
 def reset_password_page():
     with open("templates/reset_password.html") as f:
         return HTMLResponse(content=f.read())
+    
+@app.get("/doctor-queue", include_in_schema=False)
+def doctor_queue_page():
+    with open("templates/doctor_queue.html") as f:
+        return HTMLResponse(content=f.read())
 
 
 

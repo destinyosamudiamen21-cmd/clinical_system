@@ -4,17 +4,21 @@ from storage.database import get_session
 from auth.dependencies import RoleChecker, get_current_user
 from services.discharge_manager import DischargeManager
 from models.discharge_sum import DischargeCreate
+from services.encounter import EncounterManager
 
 discharge_router = APIRouter()
 
 discharge_mgr = DischargeManager()
+encounter_man = EncounterManager()
 
 @discharge_router.post("/")
 def create_discharge(
     data: DischargeCreate, 
     session: Session = Depends(get_session),
     current_user: dict = Depends(RoleChecker(["doctor", "admin"]))):
-    return discharge_mgr.create(data, created_by=current_user["uid"], session=session)
+    discharge = discharge_mgr.create(data, created_by=current_user["uid"], session=session)
+    encounter_man.advance_workflow(data.encounter_id, "complete", session)
+    return discharge
 
 @discharge_router.get("/{encounter_id}")
 def get_discharge(encounter_id: int, session: Session = Depends(get_session),
