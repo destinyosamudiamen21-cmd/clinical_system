@@ -1,5 +1,6 @@
 from sqlmodel import Session, select
 from models.encounter import EncounterCreate, Encounter
+from models.patient import Patient
 
 
 class EncounterManager():
@@ -15,14 +16,44 @@ class EncounterManager():
         session.refresh(encounter)
         return encounter
 
+    def get_doctor_queue(self, session: Session):
+        results = session.exec(
+            select(Encounter, Patient)                      
+            # select from BOTH tables
+            .join(Patient, Encounter.patient_id == Patient.id)   
+            # match them on this condition
+            .where(Encounter.workflow_status == "awaiting_doctor")
+        ).all()
+
+        # results is a list of (Encounter, Patient) pairs
+        return [
+            {
+                "id": enc.id,
+                "patient_id": enc.patient_id,
+                "patient_name": patient.full_name,
+                "ward_clinic": enc.ward_clinic,
+                "encounter_date": enc.encounter_date,
+                "workflow_status": enc.workflow_status,
+            }
+            for enc, patient in results
+        ]
+
+    def get_encounter(self, encounter_id, session: Session):
+        return session.get(Encounter, encounter_id)
+    
     def get_patient_encounters(self, patient_id, session: Session):
         return session.exec(
             select(Encounter).where(
                 Encounter.patient_id == patient_id,
-                Encounter.status != "archived"        # ← ADDED
+                Encounter.status != "archived"
             )
         ).all()
 
+
+    def get_encounter(self, encounter_id, session: Session):
+        return session.get(Encounter, encounter_id)
+    
+    
     def get_encounter(self, encounter_id, session: Session):
         return session.get(Encounter, encounter_id)
     
@@ -51,13 +82,6 @@ class EncounterManager():
             select(Encounter).where(
                 Encounter.patient_id == patient_id,
                 Encounter.status == "archived"
-            )
-        ).all()
-    
-    def get_doctor_queue(self, session: Session):
-        return session.exec(
-            select(Encounter).where(
-                Encounter.workflow_status == "awaiting_doctor"
             )
         ).all()
     

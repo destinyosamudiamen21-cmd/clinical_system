@@ -31,13 +31,14 @@ async function loadQueue() {
       "list-group-item list-group-item-action d-flex justify-content-between align-items-center";
     item.innerHTML = `
       <div>
-        <strong>Patient #${enc.patient_id}</strong>
+        <strong>${enc.patient_name}</strong>
         <span class="text-muted ms-2">${enc.ward_clinic || ""}</span>
         <span class="text-muted ms-2">${new Date(
           enc.encounter_date
         ).toLocaleString()}</span>
       </div>
       <span class="badge bg-warning">Awaiting doctor</span>
+      <span class="text-muted ms-2">${enc.ward_clinic || ""}</span>
     `;
     list.appendChild(item);
   });
