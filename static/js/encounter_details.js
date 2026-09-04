@@ -31,7 +31,12 @@ async function loadClerking() {
   if (note && note.id) {
     viewDiv.innerHTML = `
       <div class="card"><div class="card-body">
-        <p><strong>Presenting Complaints:</strong> ${note.presenting_complaints}</p>
+        <p class="text-muted mb-3"><strong>Date:</strong> ${new Date(
+          note.created_at
+        ).toLocaleString()}</p>
+        <p><strong>Presenting Complaints:</strong> ${
+          note.presenting_complaints
+        }</p>
         <p><strong>History:</strong> ${note.history}</p>
         <p><strong>Examination:</strong> ${note.examination}</p>
         <p><strong>Assessment:</strong> ${note.assessment}</p>
