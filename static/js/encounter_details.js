@@ -17,6 +17,7 @@ function showTab(tab) {
   if (tab === "fluid") loadFluid();
   if (tab === "procedure") loadProcedure();
   if (tab === "discharge") loadDischarge();
+  if (tab === "investigation") loadInvestigation();
 }
 
 // ---------- CLERKING ----------
@@ -44,8 +45,12 @@ async function loadClerking() {
         <p><strong>Investigations:</strong> ${note.investigations}</p>
         <p><strong>Treatment Plan:</strong> ${note.treatment_plan}</p>
         <p><strong>Follow-up:</strong> ${note.follow_up}</p>
+        <hr>
+        <h6 class="text-muted">Updates</h6>
+        <div id="clerkingAmendments"></div>
       </div></div>`;
     formDiv.style.display = "none";
+    renderAmendments("clerkingAmendments", "clerking", note.id);
   } else {
     viewDiv.innerHTML = `<p class="text-muted">No clerking note yet.</p>`;
     formDiv.style.display = "block";
@@ -346,10 +351,15 @@ async function loadProgress() {
         <p class="mb-1"><strong>O:</strong> ${n.objective}</p>
         <p class="mb-1"><strong>A:</strong> ${n.assessment}</p>
         <p class="mb-0"><strong>P:</strong> ${n.plan}</p>
+        <div id="progressAmendments_${n.id}"></div>
       </div>
     </div>`
     )
     .join("");
+
+  notes.forEach((n) =>
+    renderAmendments(`progressAmendments_${n.id}`, "progress", n.id)
+  );
 }
 
 document.getElementById("showProgressFormBtn").onclick = () => {
@@ -684,6 +694,195 @@ document.getElementById("saveDischargeBtn").onclick = async function () {
     alert("Could not save discharge summary.");
   }
 };
+
+// ---------- INVESTIGATION ----------
+async function loadInvestigation() {
+  const response = await authFetch(`/investigation/${encounterId}`);
+  if (!response || !response.ok) return;
+  const items = await response.json();
+
+  const list = document.getElementById("investigationList");
+  if (!Array.isArray(items) || items.length === 0) {
+    list.innerHTML = `<p class="text-muted">No investigations requested yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = items
+    .slice()
+    .reverse()
+    .map((inv) => {
+      const done = inv.results;
+      return `
+    <div class="card shadow-sm border-0 border-start border-4 border-${
+      done ? "success" : "warning"
+    } mb-2">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <small class="text-muted">Requested: ${new Date(
+            inv.created_at
+          ).toLocaleString()}</small>
+          <span class="badge bg-${done ? "success" : "warning"}">${
+        done ? "Result received" : "Pending"
+      }</span>
+        </div>
+        <p class="mb-1"><strong>Clinical Information:</strong> ${
+          inv.clinical_information
+        }</p>
+        <p class="mb-1"><strong>Examination Requested:</strong> ${
+          inv.examination_requested
+        }</p>
+        ${
+          done
+            ? `
+          <p class="mb-1"><strong>Results:</strong> ${inv.results}</p>
+          <p class="mb-0 small text-muted">Completed: ${new Date(
+            inv.date_completed
+          ).toLocaleString()}</p>
+        `
+            : `
+          <div class="mt-2">
+            <textarea class="form-control form-control-sm mb-2" id="result_${inv.id}" placeholder="Enter result..."></textarea>
+            <button class="btn btn-sm btn-primary" onclick="saveResult(${inv.id})">Save Result</button>
+          </div>
+
+          `
+        }
+        <div id="invAmendments_${inv.id}"></div>
+      </div>
+    </div>`;
+    })
+    .join("");
+
+  items.forEach((inv) =>
+    renderAmendments(`invAmendments_${inv.id}`, "investigation", inv.id)
+  );
+}
+
+async function saveResult(id) {
+  const results = document.getElementById(`result_${id}`).value;
+  if (!results.trim()) {
+    alert("Enter the result before saving.");
+    return;
+  }
+
+  const response = await authFetch(`/investigation/${id}/result`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ results: results }),
+  });
+  if (!response) return;
+  if (response.status === 403) {
+    alert("You don't have permission to enter results.");
+    return;
+  }
+  if (response.ok) {
+    loadInvestigation();
+  } else {
+    alert("Could not save result.");
+  }
+}
+
+document.getElementById("showInvFormBtn").onclick = () =>
+  (document.getElementById("investigationForm").style.display = "block");
+document.getElementById("cancelInvBtn").onclick = () =>
+  (document.getElementById("investigationForm").style.display = "none");
+
+document.getElementById("saveInvBtn").onclick = async function () {
+  const body = {
+    encounter_id: parseInt(encounterId),
+    clinical_information: document.getElementById("i_clinical_information")
+      .value,
+    examination_requested: document.getElementById("i_examination_requested")
+      .value,
+  };
+  const response = await authFetch("/investigation/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response) return;
+  if (response.status === 403) {
+    alert("Only doctors can request investigations.");
+    return;
+  }
+  if (response.ok) {
+    document.getElementById("investigationForm").style.display = "none";
+    ["i_clinical_information", "i_examination_requested"].forEach(
+      (id) => (document.getElementById(id).value = "")
+    );
+    loadInvestigation();
+  } else {
+    alert("Could not save investigation.");
+  }
+};
+
+// ---------- AMENDMENTS (shared by clerking, progress, investigation) ----------
+
+// Renders the amendment trail + an "add" box into a given container element.
+// containerId  - where to render
+// docType      - "clerking" | "progress" | "investigation"
+// docId        - id of the note being amended
+async function renderAmendments(containerId, docType, docId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+
+  const response = await authFetch(`/amendment/${docType}/${docId}`);
+  if (!response || !response.ok) return;
+  const items = await response.json();
+
+  const trail = (Array.isArray(items) ? items : [])
+    .map(
+      (a) => `
+    <div class="border-start border-3 border-secondary ps-3 mb-2">
+      <small class="text-muted d-block">${new Date(
+        a.created_at
+      ).toLocaleString()}</small>
+      <span>${a.content}</span>
+    </div>`
+    )
+    .join("");
+
+  box.innerHTML = `
+    ${trail ? `<div class="mt-3">${trail}</div>` : ""}
+    <div class="mt-3">
+      <textarea class="form-control form-control-sm mb-2"
+                id="amend_input_${docType}_${docId}"
+                placeholder="Add an update (e.g. lab result, new finding)..."></textarea>
+      <button class="btn btn-sm btn-outline-primary"
+              onclick="saveAmendment('${containerId}', '${docType}', ${docId})">
+        Add Entry
+      </button>
+    </div>`;
+}
+
+async function saveAmendment(containerId, docType, docId) {
+  const input = document.getElementById(`amend_input_${docType}_${docId}`);
+  const content = input.value.trim();
+  if (!content) {
+    alert("Write something before adding an entry.");
+    return;
+  }
+
+  const response = await authFetch("/amendment/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      document_type: docType,
+      document_id: docId,
+      content: content,
+    }),
+  });
+  if (!response) return;
+  if (response.status === 403) {
+    alert("You don't have permission to add entries.");
+    return;
+  }
+  if (response.ok) {
+    renderAmendments(containerId, docType, docId); // refresh the trail
+  } else {
+    alert("Could not add entry.");
+  }
+}
 
 // ---------- INITIAL LOAD ----------
 showTab("vitals");

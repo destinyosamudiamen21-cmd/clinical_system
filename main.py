@@ -17,6 +17,8 @@ from routes.fluid_bal_routes import fluid_router
 from routes.medication_routes import medication_router
 from routes.nursing_routes import nursing_router
 from routes.discharge_route import discharge_router
+from routes.investigation_routes import investigation_router
+from routes.amendment_routes import amendment_router
 
 
 @asynccontextmanager
@@ -101,6 +103,7 @@ app.include_router(
     tags=["payment"]
 )
 
+
 app.include_router(
     encounter_router,
     prefix="/encounter",
@@ -145,3 +148,15 @@ app.include_router(
     discharge_router, 
     prefix="/discharge", 
     tags=["discharge"])
+
+app.include_router(
+    investigation_router,
+    prefix="/investigation",
+    tags=["investigation"]
+)
+
+app.include_router(
+    amendment_router, 
+    prefix="/amendment",
+    tags=["amendment"]
+)
