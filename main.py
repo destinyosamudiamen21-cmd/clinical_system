@@ -19,6 +19,7 @@ from routes.nursing_routes import nursing_router
 from routes.discharge_route import discharge_router
 from routes.investigation_routes import investigation_router
 from routes.amendment_routes import amendment_router
+from routes.prescription_routes import prescription_router
 
 
 @asynccontextmanager
@@ -159,4 +160,10 @@ app.include_router(
     amendment_router, 
     prefix="/amendment",
     tags=["amendment"]
+)
+
+app.include_router(
+    prescription_router,
+    prefix="/prescription",
+    tags=["prescription"]
 )

@@ -1,5 +1,14 @@
 const encounterId = window.location.pathname.split("/").pop();
 
+let currentPatientId = null;
+
+async function loadEncounterInfo() {
+  const response = await authFetch(`/encounter/${encounterId}`);
+  if (!response || !response.ok) return;
+  const enc = await response.json();
+  currentPatientId = enc.patient_id;
+}
+
 // ---------- TAB SWITCHING ----------
 function showTab(tab) {
   document
@@ -13,7 +22,10 @@ function showTab(tab) {
   if (tab === "vitals") loadVitals();
   if (tab === "nursing") loadNursing();
   if (tab === "progress") loadProgress();
-  if (tab === "medication") loadMedication();
+  if (tab == "medication") {
+    loadMedication();
+    loadPrescriptionCode();
+  }
   if (tab === "fluid") loadFluid();
   if (tab === "procedure") loadProcedure();
   if (tab === "discharge") loadDischarge();
@@ -883,6 +895,80 @@ async function saveAmendment(containerId, docType, docId) {
     alert("Could not add entry.");
   }
 }
+// ---------- PRESCRIPTION CODE ----------
+async function loadPrescriptionCode() {
+  const response = await authFetch(`/prescription/encounter/${encounterId}`);
+  if (!response || !response.ok) {
+    document.getElementById("prescriptionCodeBox").innerHTML = "";
+    return;
+  }
+  const p = await response.json();
+
+  const box = document.getElementById("prescriptionCodeBox");
+  if (!p || !p.code) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const expired = new Date(p.expires_at) < new Date();
+
+  box.innerHTML = `
+    <div class="card border-success">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted d-block">Pharmacy code</small>
+          <h3 class="fw-bold mb-0" style="letter-spacing:3px">${p.code}</h3>
+          <small class="${expired ? "text-danger" : "text-muted"}">
+            ${
+              p.is_dispensed
+                ? "Already dispensed"
+                : expired
+                ? "Expired"
+                : "Valid until " + new Date(p.expires_at).toLocaleDateString()
+            }
+          </small>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" onclick="printSlip('${
+          p.code
+        }')">
+          Print Slip
+        </button>
+      </div>
+    </div>`;
+}
+
+// Opens a minimal printable slip — patient ID and code only, no drug names.
+function printSlip(code) {
+  const w = window.open("", "_blank", "width=400,height=500");
+  w.document.write(`
+    <html><head><title>Pharmacy Slip</title>
+    <style>
+      body { font-family: sans-serif; padding: 30px; text-align: center; }
+      .code { font-size: 34px; font-weight: bold; letter-spacing: 6px; margin: 20px 0; }
+      .label { color: #666; font-size: 12px; text-transform: uppercase; }
+      hr { margin: 24px 0; border: none; border-top: 1px dashed #999; }
+    </style></head>
+    <body>
+      <h3>Pharmacy Slip</h3>
+      <hr>
+      <div class="label">Patient ID</div>
+      <div style="font-size:20px; font-weight:bold">${
+        window.__patientId || "—"
+      }</div>
+      <div class="label" style="margin-top:20px">Pharmacy Code</div>
+      <div class="code">${code}</div>
+      <hr>
+      <div style="font-size:11px; color:#666">
+        Present this slip at the hospital pharmacy.
+      </div>
+    </body></html>
+  `);
+  w.document.close();
+  w.print();
+}
+
+loadEncounterInfo();
+showTab("vitals");
 
 // ---------- INITIAL LOAD ----------
 showTab("vitals");
