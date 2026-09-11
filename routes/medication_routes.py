@@ -15,13 +15,18 @@ prescription_manager = PrescriptionManager()
 
 @medication_router.post("/")
 def create_medication(
-    data: MedicationCreate, session: Session = Depends(get_session),
-    current_user: dict = Depends(RoleChecker(["doctor", "admin"]))):
-    # after the medication is created:
+    data: MedicationCreate,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(RoleChecker(["doctor", "admin"]))
+):
+    medication = medication_mgr.create(
+        data, prescribed_by=current_user["uid"], session=session
+    )
     prescription = prescription_manager.create_for_encounter(
         data.encounter_id, created_by=current_user["uid"], session=session
     )
-    return {"medication": medication_mgr, "prescription": prescription.code}
+    return {"medication": medication, "prescription_code": prescription.code}
+
 
 @medication_router.get("/{encounter_id}")
 def get_medication(

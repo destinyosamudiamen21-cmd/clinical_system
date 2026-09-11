@@ -71,6 +71,12 @@ def reset_password_page():
 def doctor_queue_page():
     with open("templates/doctor_queue.html") as f:
         return HTMLResponse(content=f.read())
+    
+@app.get("/pharmacy", include_in_schema=False)
+def pharmacy_page():
+    with open("templates/pharmacy.html") as f:
+        return HTMLResponse(content=f.read())
+
 
 
 
