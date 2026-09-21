@@ -20,6 +20,10 @@ from routes.discharge_route import discharge_router
 from routes.investigation_routes import investigation_router
 from routes.amendment_routes import amendment_router
 from routes.prescription_routes import prescription_router
+from routes.drugs_routes import drug_router
+
+
+
 
 
 @asynccontextmanager
@@ -76,6 +80,12 @@ def doctor_queue_page():
 def pharmacy_page():
     with open("templates/pharmacy.html") as f:
         return HTMLResponse(content=f.read())
+    
+@app.get("/pharmacy-admin", include_in_schema=False)
+def pharmacy_admin_page():
+    with open("templates/pharmacy_admin.html") as f:
+        return HTMLResponse(content=f.read())
+
 
 
 
@@ -173,3 +183,8 @@ app.include_router(
     prefix="/prescription",
     tags=["prescription"]
 )
+
+app.include_router(
+    drug_router,
+    prefix="/drug", 
+    tags=["drug"])

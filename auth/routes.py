@@ -29,12 +29,17 @@ class ResetPasswordRequest(BaseModel):
 
 
 @auth_router.post("/signup", response_model=UserRead)
-def create_user_account(user_data: UserCreate, session:Session = Depends(get_session)):
+def create_user_account(
+    user_data: UserCreate,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(RoleChecker(["admin", "super_admin"]))
+):
     existing_user = manager.get_user_by_email(user_data.email, session)
     if existing_user:
         raise HTTPException(status_code=403, detail="User with this email already exists")
     new_user = manager.create_account(user_data, session)
     return new_user
+
 
 @auth_router.post("/login")
 def login_user(login_data: Userlogin, session:Session = Depends(get_session)):
