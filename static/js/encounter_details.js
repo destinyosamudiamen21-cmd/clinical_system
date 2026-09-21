@@ -411,6 +411,25 @@ document.getElementById("saveProgressBtn").onclick = async function () {
   }
 };
 
+// Show the free-text box only when "Other..." is picked
+function wireOtherOption(selectId, otherId) {
+  document.getElementById(selectId).addEventListener("change", function () {
+    const box = document.getElementById(otherId);
+    box.style.display = this.value === "__other" ? "block" : "none";
+    if (this.value !== "__other") box.value = "";
+  });
+}
+wireOtherOption("m_route", "m_route_other");
+wireOtherOption("m_frequency", "m_frequency_other");
+
+// Returns the typed value when "Other" is selected, otherwise the picked one
+function pickValue(selectId, otherId) {
+  const sel = document.getElementById(selectId).value;
+  return sel === "__other"
+    ? document.getElementById(otherId).value.trim()
+    : sel;
+}
+
 // ---------- MEDICATION ----------
 async function loadMedication() {
   const response = await authFetch(`/medication/${encounterId}`);
@@ -470,8 +489,8 @@ document.getElementById("saveMedBtn").onclick = async function () {
     encounter_id: parseInt(encounterId),
     drug: document.getElementById("m_drug").value,
     dose: document.getElementById("m_dose").value,
-    route: document.getElementById("m_route").value,
-    frequency: document.getElementById("m_frequency").value,
+    route: pickValue("m_route", "m_route_other"),
+    frequency: pickValue("m_frequency", "m_frequency_other"),
     start_date: document.getElementById("m_start_date").value || null,
     stop_date: document.getElementById("m_stop_date").value || null,
   };
@@ -967,8 +986,34 @@ function printSlip(code) {
   w.print();
 }
 
+// ---------- PREV / NEXT VISIT ----------
+async function loadAdjacentEncounters() {
+  const response = await authFetch(`/encounter/${encounterId}/adjacent`);
+  if (!response || !response.ok) return;
+  const { previous_id, next_id } = await response.json();
+
+  const prevBtn = document.getElementById("prevEncounterBtn");
+  const nextBtn = document.getElementById("nextEncounterBtn");
+
+  // Disabled rather than hidden: the buttons stay in place, so the layout
+  // doesn't shift as you move between visits.
+  prevBtn.disabled = !previous_id;
+  nextBtn.disabled = !next_id;
+
+  if (previous_id)
+    prevBtn.onclick = () =>
+      (window.location.href = `/encounter-detail/${previous_id}`);
+  if (next_id)
+    nextBtn.onclick = () =>
+      (window.location.href = `/encounter-detail/${next_id}`);
+
+  document.getElementById(
+    "summaryBtn"
+  ).href = `/encounter-summary/${encounterId}`;
+}
+
 loadEncounterInfo();
-showTab("vitals");
+loadAdjacentEncounters();
 
 // ---------- INITIAL LOAD ----------
 showTab("vitals");

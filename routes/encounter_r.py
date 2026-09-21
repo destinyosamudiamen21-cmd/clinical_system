@@ -80,3 +80,14 @@ def get_encounter(
     if not encounter:
         raise HTTPException(status_code=404, detail="Encounter not Found")
     return encounter
+
+@encounter_router.get("/{encounter_id}/adjacent")
+def adjacent_encounters(
+    encounter_id: int,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user)
+):
+    result = manager.get_adjacent_encounters(encounter_id, session)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Encounter not found")
+    return result

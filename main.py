@@ -86,6 +86,10 @@ def pharmacy_admin_page():
     with open("templates/pharmacy_admin.html") as f:
         return HTMLResponse(content=f.read())
 
+@app.get("/encounter-summary/{encounter_id}", include_in_schema=False)
+def encounter_summary_page(encounter_id:int):
+    with open("templates/encounter_summary.html") as f:
+        return HTMLResponse(content=f.read())
 
 
 

@@ -13,9 +13,12 @@
   <body>
     <nav class="navbar navbar-dark bg-primary px-4">
       <span class="navbar-brand fw-bold">Encounter Details</span>
-      <a href="#" onclick="history.back()" class="btn btn-outline-light btn-sm"
-        >Back</a
-      >
+      <div class="d-flex gap-2 align-items-center">
+        <button class="btn btn-outline-light btn-sm" id="prevEncounterBtn" disabled>← Previous visit</button>
+        <button class="btn btn-outline-light btn-sm" id="nextEncounterBtn" disabled>Next visit →</button>
+       <a href="#" class="btn btn-light btn-sm" id="summaryBtn">Summary</a>
+        <a href="#" onclick="history.back()" class="btn btn-outline-light btn-sm">Back</a>
+      </div>
     </nav>
 
     <div class="container mt-4">
@@ -342,24 +345,40 @@
               <label class="form-label small">Dose</label
               ><input type="text" class="form-control" id="m_dose" />
             </div>
-            <div class="col-md-3">
-              <label class="form-label small">Route</label
-              ><input
-                type="text"
-                class="form-control"
-                id="m_route"
-                placeholder="oral, IV..."
-              />
+           <div class="col-md-3">
+            <label class="form-label small">Route</label>
+            <select class="form-select" id="m_route">
+              <option value="">Select...</option>
+              <option>Oral</option>
+              <option>IM</option>
+              <option>IV</option>
+              <option>Sublingual</option>
+              <option>Subcutaneous</option>
+              <option>Rectal</option>
+              <option>Topical</option>
+              <option value="__other">Other...</option>
+            </select>
+            <input type="text" class="form-control mt-1" id="m_route_other"
+                    placeholder="Enter route" style="display:none" />
             </div>
+
             <div class="col-md-4">
-              <label class="form-label small">Frequency</label
-              ><input
-                type="text"
-                class="form-control"
-                id="m_frequency"
-                placeholder="BD, TDS..."
-              />
+            <label class="form-label small">Frequency</label>
+            <select class="form-select" id="m_frequency">
+              <option value="">Select...</option>
+              <option>PRM</option>
+              <option>BD</option>
+              <option>TDS</option>
+              <option>Daily</option>
+              <option>Stat</option>
+              <option>QDS</option>
+              <option>Nocta</option>
+              <option value="__other">Other...</option>
+            </select>
+            <input type="text" class="form-control mt-1" id="m_frequency_other"
+                    placeholder="Enter frequency" style="display:none" />
             </div>
+
             <div class="col-md-4">
               <label class="form-label small">Start Date</label
               ><input

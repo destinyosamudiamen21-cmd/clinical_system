@@ -98,3 +98,30 @@ class EncounterManager():
         session.commit()
         session.refresh(encounter)
         return encounter
+
+
+    def get_adjacent_encounters(self, encounter_id, session: Session):
+        """Returns the previous and next encounter ids for the same patient, by date."""
+        current = session.get(Encounter, encounter_id)
+        if not current:
+            return None
+
+        # All of this patient's visits, oldest first, archived ones excluded
+        siblings = session.exec(
+            select(Encounter)
+            .where(
+                Encounter.patient_id == current.patient_id,
+                Encounter.status != "archived",
+            )
+            .order_by(Encounter.encounter_date)
+        ).all()
+
+        ids = [e.id for e in siblings]
+        if encounter_id not in ids:
+            return {"previous_id": None, "next_id": None}
+
+        i = ids.index(encounter_id)
+        return {
+            "previous_id": ids[i - 1] if i > 0 else None,
+            "next_id": ids[i + 1] if i < len(ids) - 1 else None,
+        }
