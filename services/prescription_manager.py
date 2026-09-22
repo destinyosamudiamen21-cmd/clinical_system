@@ -5,7 +5,7 @@ from models.prescription import Prescription
 from models.medication_chart import MedicationChart   # match actual model name
 from datetime import datetime, UTC
 from models.medication_chart import MedicationChart
-from models.drugs import Drug
+from models.drugs import Drug,StockTransaction
 from services.drugs_manager import DrugManager
 
 
