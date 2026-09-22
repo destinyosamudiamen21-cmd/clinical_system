@@ -91,6 +91,11 @@ def encounter_summary_page(encounter_id:int):
     with open("templates/encounter_summary.html") as f:
         return HTMLResponse(content=f.read())
 
+@app.get("/staff", include_in_schema=False)
+def staff_page():
+    with open("templates/staff.html") as f:
+        return HTMLResponse(content=f.read())
+
 
 
 

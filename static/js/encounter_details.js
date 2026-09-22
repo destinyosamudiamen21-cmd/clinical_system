@@ -411,6 +411,78 @@ document.getElementById("saveProgressBtn").onclick = async function () {
   }
 };
 
+// ---------- DRUG PICKER ----------
+let drugSearchTimer = null;
+
+document.getElementById("m_drug").addEventListener("input", function () {
+  const term = this.value.trim();
+
+  // Typing after picking invalidates the selection — otherwise you could
+  // choose PANADOL, edit the text, and still send PANADOL's id.
+  document.getElementById("m_drug_id").value = "";
+  document.getElementById("drugPickHint").textContent = "";
+
+  clearTimeout(drugSearchTimer);
+  if (term.length < 2) {
+    document.getElementById("drugSearchResults").style.display = "none";
+    return;
+  }
+  drugSearchTimer = setTimeout(() => searchDrugs(term), 300);
+});
+
+async function searchDrugs(term) {
+  const response = await authFetch(
+    `/drug/search?name=${encodeURIComponent(term)}`
+  );
+  if (!response || !response.ok) return;
+  const drugs = await response.json();
+
+  const box = document.getElementById("drugSearchResults");
+  if (!Array.isArray(drugs) || drugs.length === 0) {
+    box.innerHTML = `<div class="list-group-item text-muted small">
+      No match — you can still type the name freely.
+    </div>`;
+    box.style.display = "block";
+    return;
+  }
+
+  box.innerHTML = drugs
+    .slice(0, 20)
+    .map((dr) => {
+      const out = dr.quantity === 0;
+      const safeName = dr.name.replace(/'/g, "\\'");
+      return `<button type="button" class="list-group-item list-group-item-action"
+              onclick="selectDrug(${dr.id}, '${safeName}')">
+        <strong>${dr.name}</strong>
+        ${
+          dr.generic
+            ? `<br><small class="text-muted">${dr.generic}</small>`
+            : ""
+        }
+        <span class="badge ${out ? "bg-danger" : "bg-success"} float-end">
+          ${out ? "Out of stock" : dr.quantity + " in stock"}
+        </span>
+      </button>`;
+    })
+    .join("");
+  box.style.display = "block";
+}
+
+function selectDrug(id, name) {
+  document.getElementById("m_drug").value = name;
+  document.getElementById("m_drug_id").value = id;
+  document.getElementById("drugSearchResults").style.display = "none";
+  document.getElementById(
+    "drugPickHint"
+  ).innerHTML = `<span class="text-success">Linked to pharmacy stock</span>`;
+}
+
+document.addEventListener("click", function (e) {
+  if (e.target.id !== "m_drug") {
+    document.getElementById("drugSearchResults").style.display = "none";
+  }
+});
+
 // Show the free-text box only when "Other..." is picked
 function wireOtherOption(selectId, otherId) {
   document.getElementById(selectId).addEventListener("change", function () {
@@ -487,6 +559,9 @@ document.getElementById("cancelMedBtn").onclick = () => {
 document.getElementById("saveMedBtn").onclick = async function () {
   const body = {
     encounter_id: parseInt(encounterId),
+    drug_id: document.getElementById("m_drug_id").value
+      ? parseInt(document.getElementById("m_drug_id").value)
+      : null,
     drug: document.getElementById("m_drug").value,
     dose: document.getElementById("m_dose").value,
     route: pickValue("m_route", "m_route_other"),
@@ -494,6 +569,7 @@ document.getElementById("saveMedBtn").onclick = async function () {
     start_date: document.getElementById("m_start_date").value || null,
     stop_date: document.getElementById("m_stop_date").value || null,
   };
+
   const response = await authFetch("/medication/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

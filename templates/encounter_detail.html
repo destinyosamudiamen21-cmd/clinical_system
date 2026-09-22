@@ -337,10 +337,15 @@
         <div id="medicationForm" class="card p-3" style="display: none">
           <h6 class="mb-3">Add Medication</h6>
           <div class="row g-2">
-            <div class="col-md-6">
-              <label class="form-label small">Drug</label
-              ><input type="text" class="form-control" id="m_drug" />
-            </div>
+            <div class="col-md-6 position-relative">
+             <label class="form-label small">Drug</label>
+              <input type="text" class="form-control" id="m_drug" autocomplete="off"
+              placeholder="Start typing a drug name..." />
+               <input type="hidden" id="m_drug_id" />
+               <div id="drugSearchResults" class="list-group position-absolute shadow w-100"
+               style="z-index:1050; max-height:240px; overflow-y:auto; display:none;"></div>
+               <div class="form-text" id="drugPickHint"></div>
+                </div>
             <div class="col-md-3">
               <label class="form-label small">Dose</label
               ><input type="text" class="form-control" id="m_dose" />

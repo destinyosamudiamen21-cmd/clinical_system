@@ -23,4 +23,8 @@ class UserManager():
         session.commit()
         session.refresh(new_user)
         return new_user
+    
+    def list_users(self, session: Session):
+        return session.exec(select(User)).all()
+
 

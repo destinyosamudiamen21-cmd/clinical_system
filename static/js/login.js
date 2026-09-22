@@ -30,32 +30,32 @@ function clearMsg() {
   els.msg.textContent = "";
 }
 
-function setMode(newMode) {
-  mode = newMode;
-  clearMsg();
-  if (mode === "signup") {
-    els.title.textContent = "Create your account";
-    els.subtitle.textContent = "Set up a new staff account.";
-    els.fullNameField.style.display = "block";
-    els.roleField.style.display = "block";
-    els.submitBtn.textContent = "Sign Up";
-    els.switchLine.innerHTML =
-      'Already have an account? <a id="switchLink">Log in</a>';
-  } else {
-    els.title.textContent = "Welcome back";
-    els.subtitle.textContent = "Log in to your staff account to continue.";
-    els.fullNameField.style.display = "none";
-    els.roleField.style.display = "none";
-    els.submitBtn.textContent = "Log In";
-    els.switchLine.innerHTML =
-      'Don\'t have an account? <a id="switchLink">Sign up</a>';
-  }
-  // rebind the recreated link
-  document.getElementById("switchLink").onclick = () =>
-    setMode(mode === "login" ? "signup" : "login");
-}
+// function setMode(newMode) {
+//   mode = newMode;
+//   clearMsg();
+//   if (mode === "signup") {
+//     els.title.textContent = "Create your account";
+//     els.subtitle.textContent = "Set up a new staff account.";
+//     els.fullNameField.style.display = "block";
+//     els.roleField.style.display = "block";
+//     els.submitBtn.textContent = "Sign Up";
+//     els.switchLine.innerHTML =
+//       'Already have an account? <a id="switchLink">Log in</a>';
+//   } else {
+//     els.title.textContent = "Welcome back";
+//     els.subtitle.textContent = "Log in to your staff account to continue.";
+//     els.fullNameField.style.display = "none";
+//     els.roleField.style.display = "none";
+//     els.submitBtn.textContent = "Log In";
+//     els.switchLine.innerHTML =
+//       'Don\'t have an account? <a id="switchLink">Sign up</a>';
+//   }
+//   // rebind the recreated link
+//   document.getElementById("switchLink").onclick = () =>
+//     setMode(mode === "login" ? "signup" : "login");
+// }
 
-els.switchLink.onclick = () => setMode("signup");
+// els.switchLink.onclick = () => setMode("signup");
 
 async function handleSubmit() {
   clearMsg();
@@ -76,7 +76,7 @@ async function handleSubmit() {
   try {
     if (mode === "signup") {
       // ---- SIGN UP ----
-      const res = await fetch(SIGNUP_URL, {
+      const res = await authFetch(SIGNUP_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,6 +86,7 @@ async function handleSubmit() {
           role: els.role.value,
         }),
       });
+      if (!res) return;
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.detail || "Sign up failed.");

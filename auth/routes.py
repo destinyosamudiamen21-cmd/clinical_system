@@ -100,3 +100,16 @@ def reset_password(data: ResetPasswordRequest, session: Session = Depends(get_se
         raise HTTPException(status_code=400, detail="Could not reset password")
 
     return {"message": "Password reset successful. You can now log in."}
+
+@auth_router.get("/users")
+def list_users(
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(RoleChecker(["admin", "super_admin"]))
+):
+    users = manager.list_users(session)
+    # Only what the page needs. hashed_password must never leave the server,
+    # so the fields are listed explicitly rather than returning the objects.
+    return [
+        {"uid": str(u.uid), "full_name": u.full_name, "email": u.email, "role": u.role}
+        for u in users
+    ]

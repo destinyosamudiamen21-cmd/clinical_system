@@ -32,6 +32,11 @@ from models.Fluid_bal_chart import FluidBalance
 from models.procedure_note import ProcedureNote
 from models.discharge_sum import DischargeSummary
 from models.drugs import Drug, StockTransaction
+from models.amendment import Amendment
+from models.investigation import Investigation
+from models.prescription import Prescription
+from models.drugs import Drug, StockTransaction
+
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 
